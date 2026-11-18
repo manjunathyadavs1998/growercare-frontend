@@ -13,7 +13,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage && node scripts/coverage-summary.mjs",
-    "build": "pnpm -r --filter ./apps/* build",
+    "build": "pnpm -r --filter \"./apps/*\" build",
     "budget": "node scripts/bundle-budget.mjs",
     "i18n:check": "node scripts/i18n-check.mjs",
     "contracts:sync": "node scripts/sync-contracts.mjs",
