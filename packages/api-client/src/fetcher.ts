@@ -14,17 +14,23 @@ export interface FieldError {
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string | undefined;
+  /** The business rule that refused the request, e.g. "grower.otp-invalid" (422). */
+  readonly rule: string | undefined;
   readonly detail: string | undefined;
+  /** SPEC-GRW-03 R108: attempts left after a wrong one-time code. */
+  readonly attemptsLeft: number | undefined;
   readonly retryAfterSeconds: number | undefined;
   readonly errors: FieldError[];
   readonly requestId: string;
 
-  constructor(init: { status: number; code?: string; detail?: string; retryAfterSeconds?: number; errors?: FieldError[]; requestId: string }) {
+  constructor(init: { status: number; code?: string; rule?: string; detail?: string; attemptsLeft?: number; retryAfterSeconds?: number; errors?: FieldError[]; requestId: string }) {
     super(init.detail ?? `HTTP ${init.status}`);
     this.name = 'ApiError';
     this.status = init.status;
     this.code = init.code;
+    this.rule = init.rule;
     this.detail = init.detail;
+    this.attemptsLeft = init.attemptsLeft;
     this.retryAfterSeconds = init.retryAfterSeconds;
     this.errors = init.errors ?? [];
     this.requestId = init.requestId;
@@ -60,7 +66,7 @@ function retryAfter(headers: Headers): number | undefined {
 }
 
 async function problem(response: Response, requestId: string): Promise<ApiError> {
-  let body: { code?: string; detail?: string; errors?: FieldError[] } = {};
+  let body: { code?: string; rule?: string; detail?: string; attemptsLeft?: number; errors?: FieldError[] } = {};
   try {
     body = (await response.json()) as typeof body;
   } catch {
@@ -69,7 +75,9 @@ async function problem(response: Response, requestId: string): Promise<ApiError>
   return new ApiError({
     status: response.status,
     code: body.code,
+    rule: typeof body.rule === 'string' ? body.rule : undefined,
     detail: body.detail,
+    attemptsLeft: typeof body.attemptsLeft === 'number' ? body.attemptsLeft : undefined,
     errors: body.errors,
     retryAfterSeconds: retryAfter(response.headers),
     requestId,
