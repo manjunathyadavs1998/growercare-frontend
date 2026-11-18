@@ -19,6 +19,10 @@ for (const [name, [repo, file]] of Object.entries(SERVICES)) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
   const api = await response.json();
+  // what is written must be an OpenAPI 3 document (the file feeds code generation; review its diff like code)
+  if (typeof api?.openapi !== 'string' || !api.openapi.startsWith('3.') || typeof api.paths !== 'object' || api.paths === null) {
+    throw new Error(`${url}: not an OpenAPI 3 document`);
+  }
   for (const path of Object.keys(api.paths)) {
     if (path.startsWith('/internal/') || path.startsWith('/dev/')) delete api.paths[path];
   }
