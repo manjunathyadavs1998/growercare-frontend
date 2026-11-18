@@ -41,7 +41,7 @@ export function MyCases() {
         {items.map((c) => (
           <li key={c.caseId} className="rounded-md border border-slate-200 bg-white p-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="font-medium">{c.title}</span>
+              <Link to={`/cases/${c.caseId}`} className="font-medium text-emerald-800 underline-offset-2 hover:underline">{c.title}</Link>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-sm text-emerald-900">
                 {intl.formatMessage({ id: `caseStatus.${c.status}`, defaultMessage: c.status })}
               </span>

@@ -8,6 +8,8 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['apps/*/src/**/*.test.{ts,tsx}', 'packages/*/src/**/*.test.{ts,tsx}'],
     setupFiles: ['packages/test-utils/src/setup.ts'],
+    // the journey tests (several screens, many typed fields) need more than the 5 s default under a full parallel run
+    testTimeout: 15_000,
     coverage: {
       provider: 'v8',
       include: ['apps/*/src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}'],

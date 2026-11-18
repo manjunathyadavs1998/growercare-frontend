@@ -10,6 +10,8 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, lazy: async () => ({ Component: (await import('./features/cases/MyCases')).MyCases }) },
       { path: 'cases/new', lazy: async () => ({ Component: (await import('./features/cases/RaiseCase')).RaiseCase }) },
+      { path: 'cases/:caseId', lazy: async () => ({ Component: (await import('./features/cases/CaseDetail')).CaseDetail }) },
+      { path: 'profile', lazy: async () => ({ Component: (await import('./features/profile/Profile')).Profile }) },
       { path: 'farms', lazy: async () => ({ Component: (await import('./features/farms/Farms')).Farms }) },
       { path: '*', element: <NotFoundPage /> },
     ],

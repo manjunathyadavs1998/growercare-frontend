@@ -20,6 +20,7 @@ export function Layout() {
     <>
       <NavLink to="/" end className={link}><FormattedMessage id="nav.cases" /></NavLink>
       <NavLink to="/farms" className={link}><FormattedMessage id="nav.farms" /></NavLink>
+      <NavLink to="/profile" className={link}><FormattedMessage id="nav.profile" /></NavLink>
     </>
   );
   return (
