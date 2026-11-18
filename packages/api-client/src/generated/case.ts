@@ -117,6 +117,19 @@ export interface CasePage {
   nextCursor?: string;
 }
 
+export interface StatusInfo {
+  closed?: boolean;
+  initial?: boolean;
+  order?: number;
+  status?: string;
+}
+
+export interface CaseTypeInfo {
+  caseType?: string;
+  defaultSlaHours?: number;
+  statuses?: StatusInfo[];
+}
+
 export interface CommentView {
   attachmentIds?: string[];
   authorRole?: string;
@@ -359,6 +372,112 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export type caseTypesResponse200 = {
+  data: CaseTypeInfo[]
+  status: 200
+}
+
+export type caseTypesResponseSuccess = (caseTypesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type caseTypesResponse = (caseTypesResponseSuccess)
+
+export const getCaseTypesUrl = () => {
+
+
+
+
+  return `/case-types`
+}
+
+export const caseTypes = async ( options?: Parameters<typeof caseFetch>[1]): Promise<caseTypesResponse> => {
+
+  return caseFetch<caseTypesResponse>(getCaseTypesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCaseTypesQueryKey = () => {
+    return [
+    `/case-types`
+    ] as const;
+    }
+
+
+export const getCaseTypesQueryOptions = <TData = Awaited<ReturnType<typeof caseTypes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof caseTypes>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCaseTypesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof caseTypes>>> = ({ signal }) => caseTypes({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof caseTypes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CaseTypesQueryResult = NonNullable<Awaited<ReturnType<typeof caseTypes>>>
+export type CaseTypesQueryError = unknown
+
+
+export function useCaseTypes<TData = Awaited<ReturnType<typeof caseTypes>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof caseTypes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof caseTypes>>,
+          TError,
+          Awaited<ReturnType<typeof caseTypes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCaseTypes<TData = Awaited<ReturnType<typeof caseTypes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof caseTypes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof caseTypes>>,
+          TError,
+          Awaited<ReturnType<typeof caseTypes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCaseTypes<TData = Awaited<ReturnType<typeof caseTypes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof caseTypes>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCaseTypes<TData = Awaited<ReturnType<typeof caseTypes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof caseTypes>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCaseTypesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export type listResponse200 = {
   data: CasePage

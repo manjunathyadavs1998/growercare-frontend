@@ -118,6 +118,24 @@
         },
         "type": "object"
       },
+      "CaseTypeInfo": {
+        "properties": {
+          "caseType": {
+            "type": "string"
+          },
+          "defaultSlaHours": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "statuses": {
+            "items": {
+              "$ref": "#/components/schemas/StatusInfo"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "CaseView": {
         "properties": {
           "allowedTransitions": {
@@ -507,6 +525,24 @@
         },
         "type": "object"
       },
+      "StatusInfo": {
+        "properties": {
+          "closed": {
+            "type": "boolean"
+          },
+          "initial": {
+            "type": "boolean"
+          },
+          "order": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "TransitionRequest": {
         "properties": {
           "note": {
@@ -565,6 +601,29 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/case-types": {
+      "get": {
+        "operationId": "caseTypes",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaseTypeInfo"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "case-type-controller"
+        ]
+      }
+    },
     "/cases": {
       "get": {
         "operationId": "list",
