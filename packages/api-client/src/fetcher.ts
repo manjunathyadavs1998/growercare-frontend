@@ -104,7 +104,13 @@ export function createFetcher(prefix: string) {
   };
 }
 
-export const iamFetch = createFetcher('/iam');
-export const caseFetch = createFetcher('/cases');
-export const growerFetch = createFetcher('/grower');
-export const catalogFetch = createFetcher('/catalog');
+// orval recognises a mutator only when it is declared as a function, hence the explicit wrappers.
+const iam = createFetcher('/iam');
+const caseService = createFetcher('/cases');
+const growerService = createFetcher('/grower');
+const catalogService = createFetcher('/catalog');
+
+export const iamFetch = <T>(url: string, options?: RequestInit): Promise<T> => iam<T>(url, options);
+export const caseFetch = <T>(url: string, options?: RequestInit): Promise<T> => caseService<T>(url, options);
+export const growerFetch = <T>(url: string, options?: RequestInit): Promise<T> => growerService<T>(url, options);
+export const catalogFetch = <T>(url: string, options?: RequestInit): Promise<T> => catalogService<T>(url, options);
