@@ -1,6 +1,6 @@
 # SPEC-FE-02: grower-web (PRD J1–J4, my cases)
 - **Requirements:** PRD journeys **J1** (sign up), **J2** (phone verification + consent), **J3** (farms), **J4** (raise a complaint about a product/batch), my cases (status, timeline, conversation, attachments, share with retailer), profile (language); PRD §8 grower-web; SPEC-FE-01
-- **Status:** Agreed
+- **Status:** Implemented
 - **Owner:** growercare-frontend `apps/grower-web`
 - **IDs:** rules FE-R100+, examples FE-E100+
 
@@ -24,7 +24,7 @@
 | FE-R104 | grower `ACTIVE` | home | "My cases" (newest first, status chip, polling 30 s) and "Raise a case" |
 | FE-R105 | farms | add / edit / archive | `…/farms`: add (name, area in ha, 1–5 crops; Idempotency-Key), edit (merge patch with `If-Match`; 412 → reload), archive after an inline confirmation; an archived farm is no longer listed nor offered in the case form |
 | FE-R106 | raise a case | submit | type, farm (optional), product (search; else what it is about, D6) and batch (checked), title (≤ 200), description (≤ 4000), up to 5 photos or PDFs → `POST /api/cases/cases` with an Idempotency-Key (reused on retry), then per file: compress (D3), `POST …/attachments` with SHA-256, PUT to the presigned URL, `complete`. Back on My cases with "case … raised"; a failed upload never loses the case and is reported (the file can be added from the case, R107) |
-| FE-R107 | case detail | open | status, the public timeline (`/activity`, staff notes already hidden by the API), public comments (post own, polling 30 s), attachments (download), share with my retailer / stop sharing |
+| FE-R107 | case detail | open | status, the public timeline (`/activity`, staff notes already hidden by the API), public comments oldest first (older pages on demand; a new comment shows at once and is rolled back if refused; polling 30 s), attachments (download the clean ones; add up to 5 while the case is open), share with my retailer (the preferred partner) / stop sharing. The case view carries no share state, so the latest SHARED / UNSHARED trail entry decides |
 | FE-R108 | another grower's case id | opened by URL | the not-found page (API 404) |
 | FE-R109 | profile | change language | `PATCH /api/grower/growers/{id}` (If-Match) and the UI language |
 
