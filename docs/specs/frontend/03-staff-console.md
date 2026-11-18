@@ -15,7 +15,7 @@
 ## 1. Behaviour (rules)
 | Rule | Given | When | Then |
 |---|---|---|---|
-| FE-R200 | care.in | Queue | cases in scope, SLA risk first by default; filters of D4; cursor paging; grower names masked as the API returns them; polling 30 s |
+| FE-R200 | care.in | Queue | cases in scope, newest first (the API's only order), with one-click SLA chips (at risk, breached) to bring risky work forward; filters of D4 in the URL; cursor paging; grower names masked as the API returns them; polling 30 s |
 | FE-R201 | care.in on the phone with a grower | Grower lookup: phone + country | `POST /api/grower/growers/search` (phone in the body, never the URL) → the grower (masked) → "Cases of this grower" opens the queue filtered by `growerId` |
 | FE-R202 | case detail | open | summary, SLA badge, activity, comments with **public / internal** switch (internal only with `comment:post-internal`; clearly marked), attachments, transitions from `allowedTransitions` (with a note), Assign when `canAssign` |
 | FE-R203 | a transition or assignment | submitted with the case's ETag | 200 → view refreshed; 412 → "changed by someone else" and reload (SPEC-FE-01 R5) |
@@ -28,7 +28,7 @@
 ## 2. Examples
 | Example | Rule | Persona / input | Expected |
 |---|---|---|---|
-| FE-E200 | R200 | care.in, filter SLA = AT_RISK, then reload | only at-risk cases; filter kept after reload |
+| FE-E200 | R200 | care.in, SLA chip AT_RISK, then reload | the request asks `slaState=AT_RISK`; the filter is kept after reload (it is in the URL) |
 | FE-E201 | R201 | +91 98765 43210 | Ramesh (masked) → his cases |
 | FE-E202 | R202 | care.in on a SUBMITTED complaint | "Triage" offered, "Assign" shown; internal note marked "staff only" |
 | FE-E203 | R203 | two tabs, triage in the first, assign in the second | second: "changed by someone else", reload |
