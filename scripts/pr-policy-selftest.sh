@@ -5,8 +5,8 @@ cd "$(dirname "$0")"
 GOOD_TITLE='feat(case): add SLA timers'
 GOOD_BODY='Spec: docs/specs/case/04-sla-timers.md'
 GOOD_BRANCH='feat/sla-timers'
-MAIN='src/main/java/X.java'
-TEST='src/test/java/XTest.java'
+MAIN='apps/grower-web/src/features/cases/CaseForm.tsx'   # Node variant of the kit: frontend source
+TEST='apps/grower-web/src/features/cases/__tests__/CaseForm.test.tsx'
 passed=0; failed=0
 
 # id | expected (pass|fail) | title | body | branch | files (\n-separated) | author (default: someone)

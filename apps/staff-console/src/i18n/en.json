@@ -1,0 +1,9 @@
+{
+  "app.title": "GrowerCare Console",
+  "home.welcome": "Welcome",
+  "home.roles": "Your roles: {roles}",
+  "home.canAssign": "You can assign cases.",
+  "console.noAccount": "There is no GrowerCare account for this sign-in. Ask your administrator.",
+  "console.staffOnly.title": "This console is for staff and partners",
+  "console.staffOnly.body": "Growers use the GrowerCare app. Please sign out and open the grower app."
+}

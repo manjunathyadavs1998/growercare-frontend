@@ -1,0 +1,26 @@
+{
+  "name": "@gc/test-utils",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./setup": "./src/setup.ts"
+  },
+  "dependencies": {
+    "@gc/api-client": "workspace:*",
+    "@gc/auth": "workspace:*",
+    "@gc/i18n": "workspace:*",
+    "@tanstack/react-query": "^5.90.0",
+    "@testing-library/jest-dom": "^6.10.0",
+    "@testing-library/react": "^16.3.0",
+    "axe-core": "^4.11.0",
+    "msw": "^2.15.0",
+    "react-intl": "^7.1.14",
+    "react-router": "^7.18.0",
+    "vitest": "^4.1.12"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0"
+  }
+}

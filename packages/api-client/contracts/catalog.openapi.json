@@ -1,0 +1,468 @@
+{
+  "components": {
+    "schemas": {
+      "BatchInput": {
+        "properties": {
+          "expiryDate": {
+            "type": "string"
+          },
+          "mfgDate": {
+            "type": "string"
+          },
+          "plantCode": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "BatchReplicaView": {
+        "properties": {
+          "batchNo": {
+            "type": "string"
+          },
+          "expiryDate": {
+            "format": "date",
+            "type": "string"
+          },
+          "mfgDate": {
+            "format": "date",
+            "type": "string"
+          },
+          "plantCode": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "BatchView": {
+        "properties": {
+          "batchNo": {
+            "type": "string"
+          },
+          "expiryDate": {
+            "format": "date",
+            "type": "string"
+          },
+          "mfgDate": {
+            "format": "date",
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Ingredient": {
+        "properties": {
+          "concentration": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "IngredientInput": {
+        "properties": {
+          "concentration": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProductInput": {
+        "properties": {
+          "activeIngredients": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientInput"
+            },
+            "type": "array"
+          },
+          "buCode": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "packSizes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ProductPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProductSummary"
+            },
+            "type": "array"
+          },
+          "nextCursor": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProductReplicaView": {
+        "properties": {
+          "activeIngredients": {
+            "items": {
+              "$ref": "#/components/schemas/Ingredient"
+            },
+            "type": "array"
+          },
+          "buCode": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "packSizes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "productCode": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "registrations": {
+            "items": {
+              "$ref": "#/components/schemas/RegistrationReplicaView"
+            },
+            "type": "array"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ProductSummary": {
+        "properties": {
+          "buCode": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "productCode": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProductView": {
+        "properties": {
+          "activeIngredients": {
+            "items": {
+              "$ref": "#/components/schemas/Ingredient"
+            },
+            "type": "array"
+          },
+          "buCode": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "packSizes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "productCode": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationView"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RegistrationInput": {
+        "properties": {
+          "registrationNo": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "validUntil": {
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "RegistrationReplicaView": {
+        "properties": {
+          "countryCode": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "registrationNo": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "validUntil": {
+            "format": "date",
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "RegistrationView": {
+        "properties": {
+          "countryCode": {
+            "type": "string"
+          },
+          "registrationNo": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "validUntil": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "description": "Keycloak access token (audience gc-api)",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "GrowerCare catalog-registry-service. Errors are RFC 9457 problem+json; IDs are strings.",
+    "title": "catalog-registry-service",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/products": {
+      "get": {
+        "operationId": "search",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "country",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "product-controller"
+        ]
+      }
+    },
+    "/products/{productId}": {
+      "get": {
+        "operationId": "product_1",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "product-controller"
+        ]
+      }
+    },
+    "/products/{productId}/batches/{batchNo}": {
+      "get": {
+        "operationId": "batch_1",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "batchNo",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "product-controller"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "servers": [
+    {
+      "description": "Generated server url",
+      "url": "http://localhost"
+    }
+  ]
+}

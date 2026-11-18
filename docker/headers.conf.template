@@ -1,0 +1,5 @@
+# SPEC-FE-01 §5: included in every location (nginx does not inherit add_header into a location that sets its own).
+add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' ${OIDC_ORIGIN} ${CONNECT_EXTRA}; form-action 'self' ${OIDC_ORIGIN}; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "no-referrer" always;
+add_header Permissions-Policy "camera=(self), geolocation=(), microphone=()" always;

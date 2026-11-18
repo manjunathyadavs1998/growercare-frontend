@@ -1,0 +1,6 @@
+{
+  "app.title": "GrowerCare",
+  "home.welcome": "Welcome to GrowerCare",
+  "home.noAccount": "Your account is not set up yet. We'll do that together in the next step.",
+  "home.signedIn": "You are signed in ({country})."
+}

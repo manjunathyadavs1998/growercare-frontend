@@ -1,0 +1,19 @@
+{
+  "name": "@gc/api-client",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@gc/test-utils": "workspace:*",
+    "@gc/i18n": "workspace:*"
+  }
+}
