@@ -1,6 +1,6 @@
 # SPEC-FE-03: staff-console (PRD J5–J9, partner route group)
 - **Requirements:** PRD journeys **J5** (care triages, finds the grower by phone, assigns), **J6** (agronomist investigates and closes), **J8** (admin grants and revokes; isolation), **J9** (territory overview); partner route group (onboard a grower, my growers, cases); PRD §8 staff-console; SPEC-FE-01
-- **Status:** Agreed
+- **Status:** Implemented
 - **Owner:** growercare-frontend `apps/staff-console`
 - **IDs:** rules FE-R200+, examples FE-E200+
 
@@ -23,7 +23,7 @@
 | FE-R204 | agro.in | Queue → "Assigned to me" | own work list; same detail screen (J6) |
 | FE-R205 | tm.in | Overview | open cases by status and type, SLA at risk / breached, workload per assignee, unassigned; territory picker limited to the TM's territories (the overview's own scope); each status, type and SLA number links to the queue with the same filters. Workload shows **user ids** in Phase 1: the assignable-staff list needs one BU and the directory needs `user:read`; a staff-names lookup for `dashboard:read` is a follow-up in IAM |
 | FE-R206 | admin.in | Users & grants | search users (directory), open one: active grants; grant a role with scope (roles and territories from SPEC-IAM-04 reference endpoints) and an optional end date; revoke with a reason |
-| FE-R207 | retailer.in | Partner area | onboard a grower (assisted registration + the grower reads the code to the retailer, PRD D3), my growers (`/growers?partner=mine`), our cases (raised by or shared with our org) |
+| FE-R207 | retailer.in | Partner area | onboard a grower (assisted registration with the grower's phone, district and language, the shop as preferred retailer by default; then, with the grower present, the notices in the grower's language, the grower's optional choices, and the code sent to the grower's phone and read out to the retailer, PRD D3), my growers (`/growers?partner=mine`; pending ones offer "finish consent"), our cases (the queue, which the API already limits to cases raised by or shared with the org) |
 | FE-R208 | care.br | opens an Indian case URL | the not-found page (J8) |
 
 ## 2. Examples
