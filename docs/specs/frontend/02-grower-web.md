@@ -11,6 +11,7 @@
 | D2 | **Onboarding is a wizard driven by state, not by routes:** after sign-in the app asks `/api/iam/me` (account?) → `/api/grower/growers/me` (grower?) → its consents; it resumes at the first missing step on any device | A grower who closes the app mid-way continues where they stopped |
 | D3 | **Photos are compressed in the browser** (longest side 1600 px, JPEG ~0.8) before the presigned upload; PDFs as they are; max 10 MB after compression | 06_FRONTEND media rule; mobile data cost |
 | D4 | **Case form lists only what the grower can use:** their active farms, products registered in their country (search), batches of the chosen product, and the case types growers may raise in their country (SPEC-IAM-04 / CASE-10 reference endpoints) | No hard-coded country data (convention 4) |
+| D5 | **Crops are the codes of SPEC-GRW-02 D4** (GRAPE, ONION, SOYBEAN, RAGI, PADDY, COTTON, MAIZE, WHEAT, TOMATO, CHILLI, SUGARCANE), labelled in en/hi/mr by the app, until the crop list comes from catalog-registry (GRW-02 D4); the server still validates every code | No crop endpoint exists in Phase 1; the list is part of the agreed grower spec |
 
 ## 1. Behaviour (rules)
 | Rule | Given | When | Then |
@@ -20,7 +21,7 @@
 | FE-R102 | grower `PENDING_CONSENT` | next | the consent screen shows each **current notice's title and text** in the grower's language (`GET /api/grower/consent-notices`); SERVICE is required, the others optional |
 | FE-R103 | consent chosen | continue | `POST …/verifications` → the code screen; `…/confirm` with the code; wrong code shows attempts left; expired or too many attempts offers a new code (429 wait honoured) |
 | FE-R104 | grower `ACTIVE` | home | "My cases" (newest first, status chip, polling 30 s) and "Raise a case" |
-| FE-R105 | farms | add / edit / archive | `…/farms` CRUD with area and crop; an archived farm is no longer offered in the case form |
+| FE-R105 | farms | add / edit / archive | `…/farms`: add (name, area in ha, 1–5 crops; Idempotency-Key), edit (merge patch with `If-Match`; 412 → reload), archive after an inline confirmation; an archived farm is no longer listed nor offered in the case form |
 | FE-R106 | raise a case | submit | type, farm, product (search) and batch (of that product), title, description, up to 5 attachments → `POST /api/cases/cases` with an Idempotency-Key, then presigned uploads and `complete`; the new case opens |
 | FE-R107 | case detail | open | status, the public timeline (`/activity`, staff notes already hidden by the API), public comments (post own, polling 30 s), attachments (download), share with my retailer / stop sharing |
 | FE-R108 | another grower's case id | opened by URL | the not-found page (API 404) |
