@@ -19,12 +19,15 @@ export function Layout() {
   const noAccount = me.error instanceof ApiError && me.error.status === 401;
   const grower = me.data?.data.userType === 'GROWER';
   const policy = policyFor(me.data?.data ?? null);
+  // SPEC-FE-03 D1: retailers get the partner route group (our cases, my growers, onboarding)
+  const partner = me.data?.data.userType === 'PARTNER';
   const link = ({ isActive }: { isActive: boolean }) =>
     `inline-block border-b-2 px-3 py-3 text-sm ${isActive ? 'border-emerald-700 font-medium text-emerald-900' : 'border-transparent text-slate-700'}`;
   const nav = me.isSuccess && !grower ? (
     <>
-      {policy.can('case:read') ? <NavLink to="/" end className={link}><FormattedMessage id="nav.queue" /></NavLink> : null}
-      {policy.can('grower:read') ? <NavLink to="/growers" className={link}><FormattedMessage id="nav.growers" /></NavLink> : null}
+      {policy.can('case:read') ? <NavLink to="/" end className={link}><FormattedMessage id={partner ? 'nav.ourCases' : 'nav.queue'} /></NavLink> : null}
+      {partner && policy.can('grower:read') ? <NavLink to="/partner/growers" className={link}><FormattedMessage id="nav.myGrowers" /></NavLink> : null}
+      {!partner && policy.can('grower:read') ? <NavLink to="/growers" className={link}><FormattedMessage id="nav.growers" /></NavLink> : null}
       {policy.can('dashboard:read') ? <NavLink to="/overview" className={link}><FormattedMessage id="nav.overview" /></NavLink> : null}
       {policy.can('user:read') ? <NavLink to="/users" className={link}><FormattedMessage id="nav.users" /></NavLink> : null}
     </>
