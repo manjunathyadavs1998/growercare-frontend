@@ -6,16 +6,20 @@
  * OpenAPI spec version: v1
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -504,76 +508,50 @@ export const create = async (createCaseRequest: CreateCaseRequest, options?: Par
 
 
 
-export const getCreateQueryKey = (createCaseRequest?: CreateCaseRequest,) => {
-    return [
-    'POST', `/cases`, createCaseRequest
-    ] as const;
+export const getCreateMutationKey = () => ['create'] as const;
+
+export const getCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,CreateMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,CreateMutationVariables, TContext> => {
+
+const mutationKey = getCreateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof create>>, CreateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  create(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateMutationResult = NonNullable<Awaited<ReturnType<typeof create>>>
+    export type CreateMutationBody = CreateCaseRequest
+    export type CreateMutationError = unknown
+    export type CreateMutationVariables = {data: CreateCaseRequest}
+
+    export const useCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,CreateMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof create>>,
+        TError,
+        CreateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateMutationOptions(options), queryClient);
     }
-
-
-export const getCreateQueryOptions = <TData = Awaited<ReturnType<typeof create>>, TError = unknown>(createCaseRequest: CreateCaseRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getCreateQueryKey(createCaseRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof create>>> = ({ signal }) => create(createCaseRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CreateQueryResult = NonNullable<Awaited<ReturnType<typeof create>>>
-export type CreateQueryError = unknown
-
-
-export function useCreate<TData = Awaited<ReturnType<typeof create>>, TError = unknown>(
- createCaseRequest: CreateCaseRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof create>>,
-          TError,
-          Awaited<ReturnType<typeof create>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreate<TData = Awaited<ReturnType<typeof create>>, TError = unknown>(
- createCaseRequest: CreateCaseRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof create>>,
-          TError,
-          Awaited<ReturnType<typeof create>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreate<TData = Awaited<ReturnType<typeof create>>, TError = unknown>(
- createCaseRequest: CreateCaseRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreate<TData = Awaited<ReturnType<typeof create>>, TError = unknown>(
- createCaseRequest: CreateCaseRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getCreateQueryOptions(createCaseRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type getByNumberResponse200 = {
   data: CaseView
@@ -1042,82 +1020,50 @@ export const assign = async (caseId: string,
 
 
 
-export const getAssignQueryKey = (caseId: string,
-    assignRequest?: AssignRequest,) => {
-    return [
-    'PUT', `/cases/${caseId}/assignee`, assignRequest
-    ] as const;
+export const getAssignMutationKey = () => ['assign'] as const;
+
+export const getAssignMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assign>>, TError,AssignMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof assign>>, TError,AssignMutationVariables, TContext> => {
+
+const mutationKey = getAssignMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assign>>, AssignMutationVariables> = (props) => {
+          const {caseId,data} = props ?? {};
+
+          return  assign(caseId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignMutationResult = NonNullable<Awaited<ReturnType<typeof assign>>>
+    export type AssignMutationBody = AssignRequest
+    export type AssignMutationError = unknown
+    export type AssignMutationVariables = {caseId: string;data: AssignRequest}
+
+    export const useAssign = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assign>>, TError,AssignMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assign>>,
+        TError,
+        AssignMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAssignMutationOptions(options), queryClient);
     }
-
-
-export const getAssignQueryOptions = <TData = Awaited<ReturnType<typeof assign>>, TError = unknown>(caseId: string,
-    assignRequest: AssignRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assign>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getAssignQueryKey(caseId,assignRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof assign>>> = ({ signal }) => assign(caseId,assignRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: caseId !== null && caseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof assign>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AssignQueryResult = NonNullable<Awaited<ReturnType<typeof assign>>>
-export type AssignQueryError = unknown
-
-
-export function useAssign<TData = Awaited<ReturnType<typeof assign>>, TError = unknown>(
- caseId: string,
-    assignRequest: AssignRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof assign>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof assign>>,
-          TError,
-          Awaited<ReturnType<typeof assign>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAssign<TData = Awaited<ReturnType<typeof assign>>, TError = unknown>(
- caseId: string,
-    assignRequest: AssignRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assign>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof assign>>,
-          TError,
-          Awaited<ReturnType<typeof assign>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAssign<TData = Awaited<ReturnType<typeof assign>>, TError = unknown>(
- caseId: string,
-    assignRequest: AssignRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assign>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAssign<TData = Awaited<ReturnType<typeof assign>>, TError = unknown>(
- caseId: string,
-    assignRequest: AssignRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof assign>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getAssignQueryOptions(caseId,assignRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type list1Response200 = {
   data: AttachmentPage
@@ -1261,82 +1207,50 @@ export const request = async (caseId: string,
 
 
 
-export const getRequestQueryKey = (caseId: string,
-    requestAttachmentRequest?: RequestAttachmentRequest,) => {
-    return [
-    'POST', `/cases/${caseId}/attachments`, requestAttachmentRequest
-    ] as const;
+export const getRequestMutationKey = () => ['request'] as const;
+
+export const getRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof request>>, TError,RequestMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof request>>, TError,RequestMutationVariables, TContext> => {
+
+const mutationKey = getRequestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof request>>, RequestMutationVariables> = (props) => {
+          const {caseId,data} = props ?? {};
+
+          return  request(caseId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestMutationResult = NonNullable<Awaited<ReturnType<typeof request>>>
+    export type RequestMutationBody = RequestAttachmentRequest
+    export type RequestMutationError = unknown
+    export type RequestMutationVariables = {caseId: string;data: RequestAttachmentRequest}
+
+    export const useRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof request>>, TError,RequestMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof request>>,
+        TError,
+        RequestMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestMutationOptions(options), queryClient);
     }
-
-
-export const getRequestQueryOptions = <TData = Awaited<ReturnType<typeof request>>, TError = unknown>(caseId: string,
-    requestAttachmentRequest: RequestAttachmentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof request>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getRequestQueryKey(caseId,requestAttachmentRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof request>>> = ({ signal }) => request(caseId,requestAttachmentRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: caseId !== null && caseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof request>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type RequestQueryResult = NonNullable<Awaited<ReturnType<typeof request>>>
-export type RequestQueryError = unknown
-
-
-export function useRequest<TData = Awaited<ReturnType<typeof request>>, TError = unknown>(
- caseId: string,
-    requestAttachmentRequest: RequestAttachmentRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof request>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof request>>,
-          TError,
-          Awaited<ReturnType<typeof request>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useRequest<TData = Awaited<ReturnType<typeof request>>, TError = unknown>(
- caseId: string,
-    requestAttachmentRequest: RequestAttachmentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof request>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof request>>,
-          TError,
-          Awaited<ReturnType<typeof request>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useRequest<TData = Awaited<ReturnType<typeof request>>, TError = unknown>(
- caseId: string,
-    requestAttachmentRequest: RequestAttachmentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof request>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useRequest<TData = Awaited<ReturnType<typeof request>>, TError = unknown>(
- caseId: string,
-    requestAttachmentRequest: RequestAttachmentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof request>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getRequestQueryOptions(caseId,requestAttachmentRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type completeResponse200 = {
   data: AttachmentView
@@ -1375,82 +1289,50 @@ export const complete = async (caseId: string,
 
 
 
-export const getCompleteQueryKey = (caseId: string,
-    attachmentId: string,) => {
-    return [
-    'POST', `/cases/${caseId}/attachments/${attachmentId}/complete`
-    ] as const;
+export const getCompleteMutationKey = () => ['complete'] as const;
+
+export const getCompleteMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof complete>>, TError,CompleteMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof complete>>, TError,CompleteMutationVariables, TContext> => {
+
+const mutationKey = getCompleteMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof complete>>, CompleteMutationVariables> = (props) => {
+          const {caseId,attachmentId} = props ?? {};
+
+          return  complete(caseId,attachmentId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteMutationResult = NonNullable<Awaited<ReturnType<typeof complete>>>
+
+    export type CompleteMutationError = unknown
+    export type CompleteMutationVariables = {caseId: string;attachmentId: string}
+
+    export const useComplete = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof complete>>, TError,CompleteMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof complete>>,
+        TError,
+        CompleteMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCompleteMutationOptions(options), queryClient);
     }
-
-
-export const getCompleteQueryOptions = <TData = Awaited<ReturnType<typeof complete>>, TError = unknown>(caseId: string,
-    attachmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof complete>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getCompleteQueryKey(caseId,attachmentId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof complete>>> = ({ signal }) => complete(caseId,attachmentId, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: caseId !== null && caseId !== undefined && attachmentId !== null && attachmentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof complete>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CompleteQueryResult = NonNullable<Awaited<ReturnType<typeof complete>>>
-export type CompleteQueryError = unknown
-
-
-export function useComplete<TData = Awaited<ReturnType<typeof complete>>, TError = unknown>(
- caseId: string,
-    attachmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof complete>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof complete>>,
-          TError,
-          Awaited<ReturnType<typeof complete>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useComplete<TData = Awaited<ReturnType<typeof complete>>, TError = unknown>(
- caseId: string,
-    attachmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof complete>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof complete>>,
-          TError,
-          Awaited<ReturnType<typeof complete>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useComplete<TData = Awaited<ReturnType<typeof complete>>, TError = unknown>(
- caseId: string,
-    attachmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof complete>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useComplete<TData = Awaited<ReturnType<typeof complete>>, TError = unknown>(
- caseId: string,
-    attachmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof complete>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getCompleteQueryOptions(caseId,attachmentId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type downloadResponse200 = {
   data: DownloadView
@@ -1723,82 +1605,50 @@ export const post = async (caseId: string,
 
 
 
-export const getPostQueryKey = (caseId: string,
-    postCommentRequest?: PostCommentRequest,) => {
-    return [
-    'POST', `/cases/${caseId}/comments`, postCommentRequest
-    ] as const;
+export const getPostMutationKey = () => ['post'] as const;
+
+export const getPostMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof post>>, TError,PostMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof post>>, TError,PostMutationVariables, TContext> => {
+
+const mutationKey = getPostMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof post>>, PostMutationVariables> = (props) => {
+          const {caseId,data} = props ?? {};
+
+          return  post(caseId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostMutationResult = NonNullable<Awaited<ReturnType<typeof post>>>
+    export type PostMutationBody = PostCommentRequest
+    export type PostMutationError = unknown
+    export type PostMutationVariables = {caseId: string;data: PostCommentRequest}
+
+    export const usePost = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof post>>, TError,PostMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof post>>,
+        TError,
+        PostMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostMutationOptions(options), queryClient);
     }
-
-
-export const getPostQueryOptions = <TData = Awaited<ReturnType<typeof post>>, TError = unknown>(caseId: string,
-    postCommentRequest: PostCommentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof post>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getPostQueryKey(caseId,postCommentRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof post>>> = ({ signal }) => post(caseId,postCommentRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: caseId !== null && caseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof post>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type PostQueryResult = NonNullable<Awaited<ReturnType<typeof post>>>
-export type PostQueryError = unknown
-
-
-export function usePost<TData = Awaited<ReturnType<typeof post>>, TError = unknown>(
- caseId: string,
-    postCommentRequest: PostCommentRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof post>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof post>>,
-          TError,
-          Awaited<ReturnType<typeof post>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePost<TData = Awaited<ReturnType<typeof post>>, TError = unknown>(
- caseId: string,
-    postCommentRequest: PostCommentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof post>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof post>>,
-          TError,
-          Awaited<ReturnType<typeof post>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePost<TData = Awaited<ReturnType<typeof post>>, TError = unknown>(
- caseId: string,
-    postCommentRequest: PostCommentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof post>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePost<TData = Awaited<ReturnType<typeof post>>, TError = unknown>(
- caseId: string,
-    postCommentRequest: PostCommentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof post>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getPostQueryOptions(caseId,postCommentRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type unshareResponse200 = {
   data: void
@@ -1837,82 +1687,50 @@ export const unshare = async (caseId: string,
 
 
 
-export const getUnshareQueryKey = (caseId: string,
-    partnerOrgId: string,) => {
-    return [
-    'DELETE', `/cases/${caseId}/shares/${partnerOrgId}`
-    ] as const;
+export const getUnshareMutationKey = () => ['unshare'] as const;
+
+export const getUnshareMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unshare>>, TError,UnshareMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unshare>>, TError,UnshareMutationVariables, TContext> => {
+
+const mutationKey = getUnshareMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unshare>>, UnshareMutationVariables> = (props) => {
+          const {caseId,partnerOrgId} = props ?? {};
+
+          return  unshare(caseId,partnerOrgId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnshareMutationResult = NonNullable<Awaited<ReturnType<typeof unshare>>>
+
+    export type UnshareMutationError = unknown
+    export type UnshareMutationVariables = {caseId: string;partnerOrgId: string}
+
+    export const useUnshare = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unshare>>, TError,UnshareMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unshare>>,
+        TError,
+        UnshareMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUnshareMutationOptions(options), queryClient);
     }
-
-
-export const getUnshareQueryOptions = <TData = Awaited<ReturnType<typeof unshare>>, TError = unknown>(caseId: string,
-    partnerOrgId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof unshare>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getUnshareQueryKey(caseId,partnerOrgId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof unshare>>> = ({ signal }) => unshare(caseId,partnerOrgId, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: caseId !== null && caseId !== undefined && partnerOrgId !== null && partnerOrgId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof unshare>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type UnshareQueryResult = NonNullable<Awaited<ReturnType<typeof unshare>>>
-export type UnshareQueryError = unknown
-
-
-export function useUnshare<TData = Awaited<ReturnType<typeof unshare>>, TError = unknown>(
- caseId: string,
-    partnerOrgId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof unshare>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof unshare>>,
-          TError,
-          Awaited<ReturnType<typeof unshare>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUnshare<TData = Awaited<ReturnType<typeof unshare>>, TError = unknown>(
- caseId: string,
-    partnerOrgId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof unshare>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof unshare>>,
-          TError,
-          Awaited<ReturnType<typeof unshare>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUnshare<TData = Awaited<ReturnType<typeof unshare>>, TError = unknown>(
- caseId: string,
-    partnerOrgId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof unshare>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUnshare<TData = Awaited<ReturnType<typeof unshare>>, TError = unknown>(
- caseId: string,
-    partnerOrgId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof unshare>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getUnshareQueryOptions(caseId,partnerOrgId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type shareResponse200 = {
   data: ShareView
@@ -1951,82 +1769,50 @@ export const share = async (caseId: string,
 
 
 
-export const getShareQueryKey = (caseId: string,
-    partnerOrgId: string,) => {
-    return [
-    'PUT', `/cases/${caseId}/shares/${partnerOrgId}`
-    ] as const;
+export const getShareMutationKey = () => ['share'] as const;
+
+export const getShareMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof share>>, TError,ShareMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof share>>, TError,ShareMutationVariables, TContext> => {
+
+const mutationKey = getShareMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof share>>, ShareMutationVariables> = (props) => {
+          const {caseId,partnerOrgId} = props ?? {};
+
+          return  share(caseId,partnerOrgId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ShareMutationResult = NonNullable<Awaited<ReturnType<typeof share>>>
+
+    export type ShareMutationError = unknown
+    export type ShareMutationVariables = {caseId: string;partnerOrgId: string}
+
+    export const useShare = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof share>>, TError,ShareMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof share>>,
+        TError,
+        ShareMutationVariables,
+        TContext
+      > => {
+      return useMutation(getShareMutationOptions(options), queryClient);
     }
-
-
-export const getShareQueryOptions = <TData = Awaited<ReturnType<typeof share>>, TError = unknown>(caseId: string,
-    partnerOrgId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof share>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getShareQueryKey(caseId,partnerOrgId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof share>>> = ({ signal }) => share(caseId,partnerOrgId, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: caseId !== null && caseId !== undefined && partnerOrgId !== null && partnerOrgId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof share>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ShareQueryResult = NonNullable<Awaited<ReturnType<typeof share>>>
-export type ShareQueryError = unknown
-
-
-export function useShare<TData = Awaited<ReturnType<typeof share>>, TError = unknown>(
- caseId: string,
-    partnerOrgId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof share>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof share>>,
-          TError,
-          Awaited<ReturnType<typeof share>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useShare<TData = Awaited<ReturnType<typeof share>>, TError = unknown>(
- caseId: string,
-    partnerOrgId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof share>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof share>>,
-          TError,
-          Awaited<ReturnType<typeof share>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useShare<TData = Awaited<ReturnType<typeof share>>, TError = unknown>(
- caseId: string,
-    partnerOrgId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof share>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useShare<TData = Awaited<ReturnType<typeof share>>, TError = unknown>(
- caseId: string,
-    partnerOrgId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof share>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getShareQueryOptions(caseId,partnerOrgId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type transitionResponse200 = {
   data: CaseView
@@ -2064,73 +1850,47 @@ export const transition = async (caseId: string,
 
 
 
-export const getTransitionQueryKey = (caseId: string,
-    transitionRequest?: TransitionRequest,) => {
-    return [
-    'POST', `/cases/${caseId}/transitions`, transitionRequest
-    ] as const;
+export const getTransitionMutationKey = () => ['transition'] as const;
+
+export const getTransitionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof transition>>, TError,TransitionMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof transition>>, TError,TransitionMutationVariables, TContext> => {
+
+const mutationKey = getTransitionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof transition>>, TransitionMutationVariables> = (props) => {
+          const {caseId,data} = props ?? {};
+
+          return  transition(caseId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TransitionMutationResult = NonNullable<Awaited<ReturnType<typeof transition>>>
+    export type TransitionMutationBody = TransitionRequest
+    export type TransitionMutationError = unknown
+    export type TransitionMutationVariables = {caseId: string;data: TransitionRequest}
+
+    export const useTransition = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof transition>>, TError,TransitionMutationVariables, TContext>, request?: SecondParameter<typeof caseFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof transition>>,
+        TError,
+        TransitionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTransitionMutationOptions(options), queryClient);
     }
-
-
-export const getTransitionQueryOptions = <TData = Awaited<ReturnType<typeof transition>>, TError = unknown>(caseId: string,
-    transitionRequest: TransitionRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transition>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getTransitionQueryKey(caseId,transitionRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof transition>>> = ({ signal }) => transition(caseId,transitionRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: caseId !== null && caseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof transition>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TransitionQueryResult = NonNullable<Awaited<ReturnType<typeof transition>>>
-export type TransitionQueryError = unknown
-
-
-export function useTransition<TData = Awaited<ReturnType<typeof transition>>, TError = unknown>(
- caseId: string,
-    transitionRequest: TransitionRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof transition>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof transition>>,
-          TError,
-          Awaited<ReturnType<typeof transition>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTransition<TData = Awaited<ReturnType<typeof transition>>, TError = unknown>(
- caseId: string,
-    transitionRequest: TransitionRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transition>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof transition>>,
-          TError,
-          Awaited<ReturnType<typeof transition>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTransition<TData = Awaited<ReturnType<typeof transition>>, TError = unknown>(
- caseId: string,
-    transitionRequest: TransitionRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transition>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTransition<TData = Awaited<ReturnType<typeof transition>>, TError = unknown>(
- caseId: string,
-    transitionRequest: TransitionRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transition>>, TError, TData>>, request?: SecondParameter<typeof caseFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getTransitionQueryOptions(caseId,transitionRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}

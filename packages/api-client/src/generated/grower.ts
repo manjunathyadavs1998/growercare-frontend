@@ -6,16 +6,20 @@
  * OpenAPI spec version: v1
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -535,76 +539,50 @@ export const register = async (registerRequest: RegisterRequest, options?: Param
 
 
 
-export const getRegisterQueryKey = (registerRequest?: RegisterRequest,) => {
-    return [
-    'POST', `/growers`, registerRequest
-    ] as const;
+export const getRegisterMutationKey = () => ['register'] as const;
+
+export const getRegisterMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,RegisterMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,RegisterMutationVariables, TContext> => {
+
+const mutationKey = getRegisterMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof register>>, RegisterMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  register(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterMutationResult = NonNullable<Awaited<ReturnType<typeof register>>>
+    export type RegisterMutationBody = RegisterRequest
+    export type RegisterMutationError = unknown
+    export type RegisterMutationVariables = {data: RegisterRequest}
+
+    export const useRegister = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,RegisterMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof register>>,
+        TError,
+        RegisterMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRegisterMutationOptions(options), queryClient);
     }
-
-
-export const getRegisterQueryOptions = <TData = Awaited<ReturnType<typeof register>>, TError = unknown>(registerRequest: RegisterRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof register>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getRegisterQueryKey(registerRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof register>>> = ({ signal }) => register(registerRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof register>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type RegisterQueryResult = NonNullable<Awaited<ReturnType<typeof register>>>
-export type RegisterQueryError = unknown
-
-
-export function useRegister<TData = Awaited<ReturnType<typeof register>>, TError = unknown>(
- registerRequest: RegisterRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof register>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof register>>,
-          TError,
-          Awaited<ReturnType<typeof register>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useRegister<TData = Awaited<ReturnType<typeof register>>, TError = unknown>(
- registerRequest: RegisterRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof register>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof register>>,
-          TError,
-          Awaited<ReturnType<typeof register>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useRegister<TData = Awaited<ReturnType<typeof register>>, TError = unknown>(
- registerRequest: RegisterRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof register>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useRegister<TData = Awaited<ReturnType<typeof register>>, TError = unknown>(
- registerRequest: RegisterRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof register>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getRegisterQueryOptions(registerRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type meResponse200 = {
   data: GrowerView
@@ -747,76 +725,50 @@ export const search = async (searchRequest: SearchRequest, options?: Parameters<
 
 
 
-export const getSearchQueryKey = (searchRequest?: SearchRequest,) => {
-    return [
-    'POST', `/growers/search`, searchRequest
-    ] as const;
+export const getSearchMutationKey = () => ['search'] as const;
+
+export const getSearchMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,SearchMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,SearchMutationVariables, TContext> => {
+
+const mutationKey = getSearchMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof search>>, SearchMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  search(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SearchMutationResult = NonNullable<Awaited<ReturnType<typeof search>>>
+    export type SearchMutationBody = SearchRequest
+    export type SearchMutationError = unknown
+    export type SearchMutationVariables = {data: SearchRequest}
+
+    export const useSearch = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,SearchMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof search>>,
+        TError,
+        SearchMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSearchMutationOptions(options), queryClient);
     }
-
-
-export const getSearchQueryOptions = <TData = Awaited<ReturnType<typeof search>>, TError = unknown>(searchRequest: SearchRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getSearchQueryKey(searchRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof search>>> = ({ signal }) => search(searchRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SearchQueryResult = NonNullable<Awaited<ReturnType<typeof search>>>
-export type SearchQueryError = unknown
-
-
-export function useSearch<TData = Awaited<ReturnType<typeof search>>, TError = unknown>(
- searchRequest: SearchRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof search>>,
-          TError,
-          Awaited<ReturnType<typeof search>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSearch<TData = Awaited<ReturnType<typeof search>>, TError = unknown>(
- searchRequest: SearchRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof search>>,
-          TError,
-          Awaited<ReturnType<typeof search>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSearch<TData = Awaited<ReturnType<typeof search>>, TError = unknown>(
- searchRequest: SearchRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSearch<TData = Awaited<ReturnType<typeof search>>, TError = unknown>(
- searchRequest: SearchRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getSearchQueryOptions(searchRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type getResponse200 = {
   data: GrowerView
@@ -960,82 +912,50 @@ export const update = async (growerId: string,
 
 
 
-export const getUpdateQueryKey = (growerId: string,
-    jsonNode?: JsonNode,) => {
-    return [
-    'PATCH', `/growers/${growerId}`, jsonNode
-    ] as const;
+export const getUpdateMutationKey = () => ['update'] as const;
+
+export const getUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof update>>, TError,UpdateMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof update>>, TError,UpdateMutationVariables, TContext> => {
+
+const mutationKey = getUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof update>>, UpdateMutationVariables> = (props) => {
+          const {growerId,data} = props ?? {};
+
+          return  update(growerId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMutationResult = NonNullable<Awaited<ReturnType<typeof update>>>
+    export type UpdateMutationBody = JsonNode | undefined
+    export type UpdateMutationError = unknown
+    export type UpdateMutationVariables = {growerId: string;data?: JsonNode}
+
+    export const useUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof update>>, TError,UpdateMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof update>>,
+        TError,
+        UpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateMutationOptions(options), queryClient);
     }
-
-
-export const getUpdateQueryOptions = <TData = Awaited<ReturnType<typeof update>>, TError = unknown>(growerId: string,
-    jsonNode?: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof update>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getUpdateQueryKey(growerId,jsonNode);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof update>>> = ({ signal }) => update(growerId,jsonNode, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: growerId !== null && growerId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof update>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type UpdateQueryResult = NonNullable<Awaited<ReturnType<typeof update>>>
-export type UpdateQueryError = unknown
-
-
-export function useUpdate<TData = Awaited<ReturnType<typeof update>>, TError = unknown>(
- growerId: string,
-    jsonNode: undefined |  JsonNode, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof update>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof update>>,
-          TError,
-          Awaited<ReturnType<typeof update>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUpdate<TData = Awaited<ReturnType<typeof update>>, TError = unknown>(
- growerId: string,
-    jsonNode?: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof update>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof update>>,
-          TError,
-          Awaited<ReturnType<typeof update>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUpdate<TData = Awaited<ReturnType<typeof update>>, TError = unknown>(
- growerId: string,
-    jsonNode?: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof update>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUpdate<TData = Awaited<ReturnType<typeof update>>, TError = unknown>(
- growerId: string,
-    jsonNode?: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof update>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getUpdateQueryOptions(growerId,jsonNode,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type consentsResponse200 = {
   data: ConsentPage
@@ -1181,88 +1101,50 @@ export const setConsent = async (growerId: string,
 
 
 
-export const getSetConsentQueryKey = (growerId: string,
-    purpose: string,
-    setConsentRequest?: SetConsentRequest,) => {
-    return [
-    'PUT', `/growers/${growerId}/consents/${purpose}`, setConsentRequest
-    ] as const;
+export const getSetConsentMutationKey = () => ['setConsent'] as const;
+
+export const getSetConsentMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setConsent>>, TError,SetConsentMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setConsent>>, TError,SetConsentMutationVariables, TContext> => {
+
+const mutationKey = getSetConsentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setConsent>>, SetConsentMutationVariables> = (props) => {
+          const {growerId,purpose,data} = props ?? {};
+
+          return  setConsent(growerId,purpose,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetConsentMutationResult = NonNullable<Awaited<ReturnType<typeof setConsent>>>
+    export type SetConsentMutationBody = SetConsentRequest
+    export type SetConsentMutationError = unknown
+    export type SetConsentMutationVariables = {growerId: string;purpose: string;data: SetConsentRequest}
+
+    export const useSetConsent = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setConsent>>, TError,SetConsentMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setConsent>>,
+        TError,
+        SetConsentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSetConsentMutationOptions(options), queryClient);
     }
-
-
-export const getSetConsentQueryOptions = <TData = Awaited<ReturnType<typeof setConsent>>, TError = unknown>(growerId: string,
-    purpose: string,
-    setConsentRequest: SetConsentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof setConsent>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getSetConsentQueryKey(growerId,purpose,setConsentRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof setConsent>>> = ({ signal }) => setConsent(growerId,purpose,setConsentRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: growerId !== null && growerId !== undefined && purpose !== null && purpose !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof setConsent>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SetConsentQueryResult = NonNullable<Awaited<ReturnType<typeof setConsent>>>
-export type SetConsentQueryError = unknown
-
-
-export function useSetConsent<TData = Awaited<ReturnType<typeof setConsent>>, TError = unknown>(
- growerId: string,
-    purpose: string,
-    setConsentRequest: SetConsentRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof setConsent>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof setConsent>>,
-          TError,
-          Awaited<ReturnType<typeof setConsent>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSetConsent<TData = Awaited<ReturnType<typeof setConsent>>, TError = unknown>(
- growerId: string,
-    purpose: string,
-    setConsentRequest: SetConsentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof setConsent>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof setConsent>>,
-          TError,
-          Awaited<ReturnType<typeof setConsent>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSetConsent<TData = Awaited<ReturnType<typeof setConsent>>, TError = unknown>(
- growerId: string,
-    purpose: string,
-    setConsentRequest: SetConsentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof setConsent>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSetConsent<TData = Awaited<ReturnType<typeof setConsent>>, TError = unknown>(
- growerId: string,
-    purpose: string,
-    setConsentRequest: SetConsentRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof setConsent>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getSetConsentQueryOptions(growerId,purpose,setConsentRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type listResponse200 = {
   data: FarmPage
@@ -1421,82 +1303,50 @@ export const create = async (growerId: string,
 
 
 
-export const getCreateQueryKey = (growerId: string,
-    jsonNode?: JsonNode,) => {
-    return [
-    'POST', `/growers/${growerId}/farms`, jsonNode
-    ] as const;
+export const getCreateMutationKey = () => ['create'] as const;
+
+export const getCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,CreateMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,CreateMutationVariables, TContext> => {
+
+const mutationKey = getCreateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof create>>, CreateMutationVariables> = (props) => {
+          const {growerId,data} = props ?? {};
+
+          return  create(growerId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateMutationResult = NonNullable<Awaited<ReturnType<typeof create>>>
+    export type CreateMutationBody = JsonNode
+    export type CreateMutationError = unknown
+    export type CreateMutationVariables = {growerId: string;data: JsonNode}
+
+    export const useCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,CreateMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof create>>,
+        TError,
+        CreateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateMutationOptions(options), queryClient);
     }
-
-
-export const getCreateQueryOptions = <TData = Awaited<ReturnType<typeof create>>, TError = unknown>(growerId: string,
-    jsonNode: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getCreateQueryKey(growerId,jsonNode);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof create>>> = ({ signal }) => create(growerId,jsonNode, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: growerId !== null && growerId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CreateQueryResult = NonNullable<Awaited<ReturnType<typeof create>>>
-export type CreateQueryError = unknown
-
-
-export function useCreate<TData = Awaited<ReturnType<typeof create>>, TError = unknown>(
- growerId: string,
-    jsonNode: JsonNode, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof create>>,
-          TError,
-          Awaited<ReturnType<typeof create>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreate<TData = Awaited<ReturnType<typeof create>>, TError = unknown>(
- growerId: string,
-    jsonNode: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof create>>,
-          TError,
-          Awaited<ReturnType<typeof create>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreate<TData = Awaited<ReturnType<typeof create>>, TError = unknown>(
- growerId: string,
-    jsonNode: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreate<TData = Awaited<ReturnType<typeof create>>, TError = unknown>(
- growerId: string,
-    jsonNode: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof create>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getCreateQueryOptions(growerId,jsonNode,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type get1Response200 = {
   data: FarmView
@@ -1650,88 +1500,50 @@ export const update1 = async (growerId: string,
 
 
 
-export const getUpdate1QueryKey = (growerId: string,
-    farmId: string,
-    jsonNode?: JsonNode,) => {
-    return [
-    'PATCH', `/growers/${growerId}/farms/${farmId}`, jsonNode
-    ] as const;
+export const getUpdate1MutationKey = () => ['update1'] as const;
+
+export const getUpdate1MutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof update1>>, TError,Update1MutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof update1>>, TError,Update1MutationVariables, TContext> => {
+
+const mutationKey = getUpdate1MutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof update1>>, Update1MutationVariables> = (props) => {
+          const {growerId,farmId,data} = props ?? {};
+
+          return  update1(growerId,farmId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type Update1MutationResult = NonNullable<Awaited<ReturnType<typeof update1>>>
+    export type Update1MutationBody = JsonNode | undefined
+    export type Update1MutationError = unknown
+    export type Update1MutationVariables = {growerId: string;farmId: string;data?: JsonNode}
+
+    export const useUpdate1 = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof update1>>, TError,Update1MutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof update1>>,
+        TError,
+        Update1MutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdate1MutationOptions(options), queryClient);
     }
-
-
-export const getUpdate1QueryOptions = <TData = Awaited<ReturnType<typeof update1>>, TError = unknown>(growerId: string,
-    farmId: string,
-    jsonNode?: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof update1>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getUpdate1QueryKey(growerId,farmId,jsonNode);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof update1>>> = ({ signal }) => update1(growerId,farmId,jsonNode, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: growerId !== null && growerId !== undefined && farmId !== null && farmId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof update1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type Update1QueryResult = NonNullable<Awaited<ReturnType<typeof update1>>>
-export type Update1QueryError = unknown
-
-
-export function useUpdate1<TData = Awaited<ReturnType<typeof update1>>, TError = unknown>(
- growerId: string,
-    farmId: string,
-    jsonNode: undefined |  JsonNode, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof update1>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof update1>>,
-          TError,
-          Awaited<ReturnType<typeof update1>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUpdate1<TData = Awaited<ReturnType<typeof update1>>, TError = unknown>(
- growerId: string,
-    farmId: string,
-    jsonNode?: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof update1>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof update1>>,
-          TError,
-          Awaited<ReturnType<typeof update1>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUpdate1<TData = Awaited<ReturnType<typeof update1>>, TError = unknown>(
- growerId: string,
-    farmId: string,
-    jsonNode?: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof update1>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUpdate1<TData = Awaited<ReturnType<typeof update1>>, TError = unknown>(
- growerId: string,
-    farmId: string,
-    jsonNode?: JsonNode, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof update1>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getUpdate1QueryOptions(growerId,farmId,jsonNode,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type archiveResponse200 = {
   data: FarmView
@@ -1770,82 +1582,50 @@ export const archive = async (growerId: string,
 
 
 
-export const getArchiveQueryKey = (growerId: string,
-    farmId: string,) => {
-    return [
-    'POST', `/growers/${growerId}/farms/${farmId}/archive`
-    ] as const;
+export const getArchiveMutationKey = () => ['archive'] as const;
+
+export const getArchiveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archive>>, TError,ArchiveMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof archive>>, TError,ArchiveMutationVariables, TContext> => {
+
+const mutationKey = getArchiveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof archive>>, ArchiveMutationVariables> = (props) => {
+          const {growerId,farmId} = props ?? {};
+
+          return  archive(growerId,farmId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof archive>>>
+
+    export type ArchiveMutationError = unknown
+    export type ArchiveMutationVariables = {growerId: string;farmId: string}
+
+    export const useArchive = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archive>>, TError,ArchiveMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof archive>>,
+        TError,
+        ArchiveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getArchiveMutationOptions(options), queryClient);
     }
-
-
-export const getArchiveQueryOptions = <TData = Awaited<ReturnType<typeof archive>>, TError = unknown>(growerId: string,
-    farmId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof archive>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getArchiveQueryKey(growerId,farmId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof archive>>> = ({ signal }) => archive(growerId,farmId, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: growerId !== null && growerId !== undefined && farmId !== null && farmId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof archive>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ArchiveQueryResult = NonNullable<Awaited<ReturnType<typeof archive>>>
-export type ArchiveQueryError = unknown
-
-
-export function useArchive<TData = Awaited<ReturnType<typeof archive>>, TError = unknown>(
- growerId: string,
-    farmId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof archive>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof archive>>,
-          TError,
-          Awaited<ReturnType<typeof archive>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useArchive<TData = Awaited<ReturnType<typeof archive>>, TError = unknown>(
- growerId: string,
-    farmId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof archive>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof archive>>,
-          TError,
-          Awaited<ReturnType<typeof archive>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useArchive<TData = Awaited<ReturnType<typeof archive>>, TError = unknown>(
- growerId: string,
-    farmId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof archive>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useArchive<TData = Awaited<ReturnType<typeof archive>>, TError = unknown>(
- growerId: string,
-    farmId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof archive>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getArchiveQueryOptions(growerId,farmId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type startResponse200 = {
   data: VerificationView
@@ -1883,82 +1663,50 @@ export const start = async (growerId: string,
 
 
 
-export const getStartQueryKey = (growerId: string,
-    startRequest?: StartRequest,) => {
-    return [
-    'POST', `/growers/${growerId}/verifications`, startRequest
-    ] as const;
+export const getStartMutationKey = () => ['start'] as const;
+
+export const getStartMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof start>>, TError,StartMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof start>>, TError,StartMutationVariables, TContext> => {
+
+const mutationKey = getStartMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof start>>, StartMutationVariables> = (props) => {
+          const {growerId,data} = props ?? {};
+
+          return  start(growerId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartMutationResult = NonNullable<Awaited<ReturnType<typeof start>>>
+    export type StartMutationBody = StartRequest
+    export type StartMutationError = unknown
+    export type StartMutationVariables = {growerId: string;data: StartRequest}
+
+    export const useStart = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof start>>, TError,StartMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof start>>,
+        TError,
+        StartMutationVariables,
+        TContext
+      > => {
+      return useMutation(getStartMutationOptions(options), queryClient);
     }
-
-
-export const getStartQueryOptions = <TData = Awaited<ReturnType<typeof start>>, TError = unknown>(growerId: string,
-    startRequest: StartRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof start>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getStartQueryKey(growerId,startRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof start>>> = ({ signal }) => start(growerId,startRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: growerId !== null && growerId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof start>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type StartQueryResult = NonNullable<Awaited<ReturnType<typeof start>>>
-export type StartQueryError = unknown
-
-
-export function useStart<TData = Awaited<ReturnType<typeof start>>, TError = unknown>(
- growerId: string,
-    startRequest: StartRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof start>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof start>>,
-          TError,
-          Awaited<ReturnType<typeof start>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStart<TData = Awaited<ReturnType<typeof start>>, TError = unknown>(
- growerId: string,
-    startRequest: StartRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof start>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof start>>,
-          TError,
-          Awaited<ReturnType<typeof start>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStart<TData = Awaited<ReturnType<typeof start>>, TError = unknown>(
- growerId: string,
-    startRequest: StartRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof start>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStart<TData = Awaited<ReturnType<typeof start>>, TError = unknown>(
- growerId: string,
-    startRequest: StartRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof start>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getStartQueryOptions(growerId,startRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export type confirmResponse200 = {
   data: GrowerView
@@ -1998,79 +1746,47 @@ export const confirm = async (growerId: string,
 
 
 
-export const getConfirmQueryKey = (growerId: string,
-    verificationId: string,
-    confirmRequest?: ConfirmRequest,) => {
-    return [
-    'POST', `/growers/${growerId}/verifications/${verificationId}/confirm`, confirmRequest
-    ] as const;
+export const getConfirmMutationKey = () => ['confirm'] as const;
+
+export const getConfirmMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirm>>, TError,ConfirmMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirm>>, TError,ConfirmMutationVariables, TContext> => {
+
+const mutationKey = getConfirmMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirm>>, ConfirmMutationVariables> = (props) => {
+          const {growerId,verificationId,data} = props ?? {};
+
+          return  confirm(growerId,verificationId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmMutationResult = NonNullable<Awaited<ReturnType<typeof confirm>>>
+    export type ConfirmMutationBody = ConfirmRequest
+    export type ConfirmMutationError = unknown
+    export type ConfirmMutationVariables = {growerId: string;verificationId: string;data: ConfirmRequest}
+
+    export const useConfirm = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirm>>, TError,ConfirmMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof confirm>>,
+        TError,
+        ConfirmMutationVariables,
+        TContext
+      > => {
+      return useMutation(getConfirmMutationOptions(options), queryClient);
     }
-
-
-export const getConfirmQueryOptions = <TData = Awaited<ReturnType<typeof confirm>>, TError = unknown>(growerId: string,
-    verificationId: string,
-    confirmRequest: ConfirmRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof confirm>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getConfirmQueryKey(growerId,verificationId,confirmRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof confirm>>> = ({ signal }) => confirm(growerId,verificationId,confirmRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: growerId !== null && growerId !== undefined && verificationId !== null && verificationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof confirm>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ConfirmQueryResult = NonNullable<Awaited<ReturnType<typeof confirm>>>
-export type ConfirmQueryError = unknown
-
-
-export function useConfirm<TData = Awaited<ReturnType<typeof confirm>>, TError = unknown>(
- growerId: string,
-    verificationId: string,
-    confirmRequest: ConfirmRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof confirm>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof confirm>>,
-          TError,
-          Awaited<ReturnType<typeof confirm>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useConfirm<TData = Awaited<ReturnType<typeof confirm>>, TError = unknown>(
- growerId: string,
-    verificationId: string,
-    confirmRequest: ConfirmRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof confirm>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof confirm>>,
-          TError,
-          Awaited<ReturnType<typeof confirm>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useConfirm<TData = Awaited<ReturnType<typeof confirm>>, TError = unknown>(
- growerId: string,
-    verificationId: string,
-    confirmRequest: ConfirmRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof confirm>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useConfirm<TData = Awaited<ReturnType<typeof confirm>>, TError = unknown>(
- growerId: string,
-    verificationId: string,
-    confirmRequest: ConfirmRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof confirm>>, TError, TData>>, request?: SecondParameter<typeof growerFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getConfirmQueryOptions(growerId,verificationId,confirmRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}

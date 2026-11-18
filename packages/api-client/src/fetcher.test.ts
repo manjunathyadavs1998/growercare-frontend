@@ -64,6 +64,13 @@ describe('SPEC-FE-01 the API client', () => {
     expect(error.code).toBeUndefined();
   });
 
+  it('SPEC-GRW-03 R108 the rule and the attempts left travel with a 422', async () => {
+    server.use(http.get('http://localhost/api/iam/me', () => problem(422, { code: 'BUSINESS_RULE_VIOLATION', rule: 'grower.otp-invalid', attemptsLeft: 2 })));
+    const error = (await me().catch((e: unknown) => e)) as ApiError;
+    expect(error.rule).toBe('grower.otp-invalid');
+    expect(error.attemptsLeft).toBe(2);
+  });
+
   it('FE-E5 no answer at all is status 0 (network)', async () => {
     server.use(http.get('http://localhost/api/iam/me', () => HttpResponse.error()));
     const error = (await me().catch((e: unknown) => e)) as ApiError;

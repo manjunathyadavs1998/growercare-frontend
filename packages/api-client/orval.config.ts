@@ -12,7 +12,7 @@ const service = (name: string, fetcher: string) => ({
     prettier: false,
     override: {
       mutator: { path: './src/fetcher.ts', name: fetcher },
-      query: { useQuery: true, useInfinite: false, signal: true },
+      query: { useInfinite: false, signal: true },
     },
   },
 });
