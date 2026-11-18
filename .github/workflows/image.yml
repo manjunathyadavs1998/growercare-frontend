@@ -1,0 +1,48 @@
+# SPEC-FE-01 D10: every push to main builds both apps and pushes their nginx images to GHCR as :sha-<commit> and
+# :latest. Configuration is a runtime /config.json (written from environment variables at container start).
+name: image
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        app: [grower-web, staff-console]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Build the app
+        run: corepack enable && pnpm install --frozen-lockfile && pnpm --filter "${{ matrix.app }}" build
+
+      - name: Build and push the image
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ACTOR: ${{ github.actor }}
+          OWNER: ${{ github.repository_owner }}
+          SHA: ${{ github.sha }}
+          APP: ${{ matrix.app }}
+        run: |
+          image="ghcr.io/${OWNER,,}/$APP"
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+          docker build -f docker/Dockerfile --build-arg APP="$APP" -t "$image:sha-${SHA::12}" -t "$image:latest" .
+          docker push --all-tags "$image"

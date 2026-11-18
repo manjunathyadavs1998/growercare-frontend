@@ -1,0 +1,71 @@
+# SPEC-FE-01 D9: lint, types, i18n completeness, API contract drift, tests with the 80 % line-coverage gate, build and
+# the grower-web bundle budget. Required status check for main: "verify". (Node variant of the growercare repo kit.)
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write     # sticky coverage comment (SPEC-PLAT-03 R42); read-only on fork PRs
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: pnpm (version from package.json "packageManager", via corepack)
+        run: corepack enable && pnpm --version
+
+      - name: Install (lockfile must be up to date)
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Types
+        run: pnpm typecheck
+
+      - name: Every message in every language (FE-01 D7)
+        run: pnpm i18n:check
+
+      - name: API client drift (regenerate from the committed contracts; commit the result with the change)
+        run: |
+          pnpm api:generate
+          git diff --exit-code -- packages/api-client/src/generated
+
+      - name: Tests with coverage (lines >= 80 %, SPEC-PLAT-03 R41)
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      - name: Bundle budget (grower-web initial JS <= 170 KB gzip)
+        run: pnpm budget
+
+      - name: Coverage comment on the PR
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          [ -f coverage/summary.md ] || exit 0
+          existing=$(gh api "repos/$REPO/issues/$PR/comments" --paginate --jq '.[] | select(.body | startswith("<!-- coverage-gate -->")) | .id' | head -1)
+          if [ -n "$existing" ]; then gh api -X PATCH "repos/$REPO/issues/comments/$existing" -F body=@coverage/summary.md --silent
+          else gh pr comment "$PR" --repo "$REPO" --body-file coverage/summary.md; fi
