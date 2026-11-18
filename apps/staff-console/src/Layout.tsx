@@ -25,6 +25,8 @@ export function Layout() {
     <>
       {policy.can('case:read') ? <NavLink to="/" end className={link}><FormattedMessage id="nav.queue" /></NavLink> : null}
       {policy.can('grower:read') ? <NavLink to="/growers" className={link}><FormattedMessage id="nav.growers" /></NavLink> : null}
+      {policy.can('dashboard:read') ? <NavLink to="/overview" className={link}><FormattedMessage id="nav.overview" /></NavLink> : null}
+      {policy.can('user:read') ? <NavLink to="/users" className={link}><FormattedMessage id="nav.users" /></NavLink> : null}
     </>
   ) : undefined;
   return (

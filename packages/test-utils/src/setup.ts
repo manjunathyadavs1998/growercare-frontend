@@ -1,12 +1,16 @@
 import '@testing-library/jest-dom/vitest';
 import { configureApi } from '@gc/api-client';
 import { currentLanguage } from '@gc/i18n';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 import { server } from './server';
 
 /** The signed-in test user's token and what a 401 did (reset before each test). */
 export const testSession = { token: 'test-token' as string | null, unauthorized: 0 };
+
+// findBy…/waitFor give up after 1 s by default; a full parallel run on a laptop needs more (the timeout only matters
+// when something is slow; a passing assertion still returns as soon as it holds)
+configure({ asyncUtilTimeout: 5_000 });
 
 let mswFetch: typeof fetch;
 beforeAll(() => {

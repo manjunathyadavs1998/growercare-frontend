@@ -1,13 +1,11 @@
 import { ApiError, cases, catalog, grower, useIdempotencyKey } from '@gc/api-client';
-import { Button, ErrorView } from '@gc/ui-kit';
+import { BUSINESS_UNITS, Button, ErrorView } from '@gc/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router';
 import { MAX_FILES, uploadAttachment } from './upload';
 
-/** SPEC-FE-02 D6: what a case without a product is about (the seeded business units; the server validates). */
-export const BUSINESS_UNITS = ['CP', 'SEEDS', 'BIO', 'PROF'] as const;
 
 const input = 'mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base';
 

@@ -10,6 +10,7 @@
 | D1 | **One console, navigation by permission:** Queue (`case:read`), Grower lookup (`grower:read`), Overview (`dashboard:read`), Users & grants (`user:read`), Partner area (PARTNER users: onboard a grower, my growers, our cases). A grower signing in sees "this console is for staff and partners" and a sign-out button | Same app for care, agronomists, TMs, admins and retailers (06_FRONTEND §1) |
 | D2 | **Desktop first** (≥ 1280 px), usable at 1024 px; dense tables (TanStack Table, virtualised over 200 rows) | Care agents work queues all day |
 | D3 | **The workflow comes from the API:** transition buttons are `allowedTransitions`, the assign button is `canAssign` (SPEC-CASE-09); the assignee picker lists **assignable staff** for the case (SPEC-IAM-04) | No workflow or permission logic duplicated in the UI |
+| D5 | **Business units are the seeded codes** (CP, SEEDS, BIO, PROF; ui-kit `BUSINESS_UNITS`, as SPEC-FE-02 D6) for a grant's BU scope until a BU endpoint exists; IAM validates them | No BU reference endpoint in Phase 1 |
 | D4 | **Queue filters live in the URL** (status, type, territory, SLA, assigned to me, grower, product/batch) so a filtered queue can be bookmarked; no personal data in it (the grower filter is an id) | Shareable, reload-safe, PRD §7 no PII in URLs |
 
 ## 1. Behaviour (rules)
@@ -20,7 +21,7 @@
 | FE-R202 | case detail | open | summary, SLA badge, activity, comments with **public / internal** switch (internal only with `comment:post-internal`; clearly marked), attachments, transitions from `allowedTransitions` (with a note), Assign when `canAssign` |
 | FE-R203 | a transition or assignment | submitted with the case's ETag | 200 → view refreshed; 412 → "changed by someone else" and reload (SPEC-FE-01 R5) |
 | FE-R204 | agro.in | Queue → "Assigned to me" | own work list; same detail screen (J6) |
-| FE-R205 | tm.in | Overview | open cases by status and type, SLA at risk / breached, workload per assignee (names from the assignable-staff list), unassigned; territory picker limited to the TM's territories; each number links to the queue with the same filters |
+| FE-R205 | tm.in | Overview | open cases by status and type, SLA at risk / breached, workload per assignee, unassigned; territory picker limited to the TM's territories (the overview's own scope); each status, type and SLA number links to the queue with the same filters. Workload shows **user ids** in Phase 1: the assignable-staff list needs one BU and the directory needs `user:read`; a staff-names lookup for `dashboard:read` is a follow-up in IAM |
 | FE-R206 | admin.in | Users & grants | search users (directory), open one: active grants; grant a role with scope (roles and territories from SPEC-IAM-04 reference endpoints) and an optional end date; revoke with a reason |
 | FE-R207 | retailer.in | Partner area | onboard a grower (assisted registration + the grower reads the code to the retailer, PRD D3), my growers (`/growers?partner=mine`), our cases (raised by or shared with our org) |
 | FE-R208 | care.br | opens an Indian case URL | the not-found page (J8) |
