@@ -9,6 +9,7 @@ export const routes: RouteObject[] = [
     errorElement: <RouteError />,
     children: [
       { index: true, lazy: async () => ({ Component: (await import('./features/cases/MyCases')).MyCases }) },
+      { path: 'cases/new', lazy: async () => ({ Component: (await import('./features/cases/RaiseCase')).RaiseCase }) },
       { path: 'farms', lazy: async () => ({ Component: (await import('./features/farms/Farms')).Farms }) },
       { path: '*', element: <NotFoundPage /> },
     ],
