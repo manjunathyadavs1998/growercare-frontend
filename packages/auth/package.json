@@ -1,0 +1,15 @@
+{
+  "name": "@gc/auth",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "oidc-client-ts": "^3.5.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0"
+  }
+}

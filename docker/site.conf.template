@@ -1,0 +1,33 @@
+# SPEC-FE-01 D10: the static app, its runtime /config.json, and /api proxied to the edge gateway (one origin, no CORS).
+server {
+    listen 8080;
+    server_tokens off;
+    root /usr/share/nginx/html;
+
+    location /api/ {
+        proxy_pass ${API_UPSTREAM};
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        client_max_body_size 1m;
+    }
+
+    location = /config.json {
+        include /etc/nginx/gc/headers.conf;
+        add_header Cache-Control "no-store" always;
+    }
+
+    # hashed file names: cache for a year
+    location /assets/ {
+        include /etc/nginx/gc/headers.conf;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        try_files $uri =404;
+    }
+
+    # every app route is index.html (client-side routing); index.html itself is never cached
+    location / {
+        include /etc/nginx/gc/headers.conf;
+        add_header Cache-Control "no-cache" always;
+        try_files $uri /index.html;
+    }
+}

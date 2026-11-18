@@ -1,0 +1,5 @@
+{
+  "oidcAuthority": "http://localhost:8180/realms/growercare",
+  "oidcClientId": "grower-web",
+  "apiBase": "/api"
+}

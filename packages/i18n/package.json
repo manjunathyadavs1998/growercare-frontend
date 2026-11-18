@@ -1,0 +1,6 @@
+{
+  "name": "@gc/i18n", "private": true, "type": "module", "version": "0.0.0",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "react-intl": "^7.1.14", "zustand": "^5.0.0" },
+  "peerDependencies": { "react": "^19.2.0" }
+}

@@ -1,6 +1,6 @@
 # SPEC-FE-01: Frontend foundation (monorepo, sign-in, API client, errors, i18n)
 - **Requirements:** PRD Phase 1 §7 (tokens only in memory, PKCE, no PII in URLs, i18n en/hi/mr, friendly errors, 170 KB budget, axe), §8 (UI scope), D1 (Keycloak sign-in, phone as username), D4 (one repository, pnpm monorepo); architecture `docs/architecture/06_FRONTEND.md`, ADR-009
-- **Status:** Agreed
+- **Status:** Implemented
 - **Owner:** growercare-frontend (new repository)
 - **IDs:** rules FE-R1+, examples FE-E1+
 

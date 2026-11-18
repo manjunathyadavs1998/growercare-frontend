@@ -1,0 +1,20 @@
+{
+  "action.retry": "Try again",
+  "action.reload": "Reload",
+  "action.home": "Go to the start page",
+  "error.signIn": "Your session has ended. Signing you in again…",
+  "error.forbidden": "You can't do this with your current role.",
+  "error.conflict": "Someone else changed this in the meantime. Reload to see the latest version.",
+  "error.rule": "This isn't possible right now.",
+  "error.invalid": "Please check what you entered.",
+  "error.tooMany": "Too many attempts. Try again in {seconds, plural, one {# second} other {# seconds}}.",
+  "error.unavailable": "We can't reach the service right now. The rest of the page still works.",
+  "error.unexpected": "Something went wrong.",
+  "error.reference": "Reference: {id}",
+  "notFound.title": "Not found",
+  "notFound.body": "This page doesn't exist, or you don't have access to it.",
+  "shell.language": "Language",
+  "shell.signOut": "Sign out",
+  "shell.navigation": "Main",
+  "shell.loading": "Loading…"
+}

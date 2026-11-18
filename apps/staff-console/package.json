@@ -1,0 +1,30 @@
+{
+  "name": "staff-console",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5174"
+  },
+  "dependencies": {
+    "@gc/api-client": "workspace:*",
+    "@gc/auth": "workspace:*",
+    "@gc/i18n": "workspace:*",
+    "@gc/policy": "workspace:*",
+    "@gc/ui-kit": "workspace:*",
+    "@tanstack/react-query": "^5.90.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-intl": "^7.1.14",
+    "react-router": "^7.18.0",
+    "zustand": "^5.0.0",
+    "oidc-client-ts": "^3.5.0"
+  },
+  "devDependencies": {
+    "@gc/test-utils": "workspace:*",
+    "@tailwindcss/vite": "^4.1.0",
+    "tailwindcss": "^4.1.0"
+  }
+}
