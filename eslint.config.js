@@ -4,7 +4,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/coverage/**', '**/node_modules/**', 'packages/api-client/src/generated/**'] },
+  { ignores: ['**/dist/**', '**/coverage/**', '**/node_modules/**', 'e2e/playwright-report/**', 'e2e/test-results/**', 'packages/api-client/src/generated/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -18,4 +18,6 @@ export default tseslint.config(
     },
   },
   { files: ['scripts/**/*.mjs'], languageOptions: { globals: { ...globals.node } } },
+  // SPEC-FE-04: the Playwright journeys run in Node (and evaluate some code in the page)
+  { files: ['e2e/**/*.ts'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
 );

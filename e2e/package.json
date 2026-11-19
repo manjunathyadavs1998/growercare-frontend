@@ -1,0 +1,16 @@
+{
+  "name": "e2e",
+  "private": true,
+  "type": "module",
+  "description": "SPEC-FE-04: Playwright journeys J1–J9 against the local stack (built apps in their nginx images)",
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^24.0.0",
+    "typescript": "~5.9.3"
+  }
+}
