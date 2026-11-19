@@ -21,10 +21,11 @@
 | FE-R202 | case detail | open | summary, SLA badge, activity, comments with **public / internal** switch (internal only with `comment:post-internal`; clearly marked), attachments, transitions from `allowedTransitions` (with a note), Assign when `canAssign` |
 | FE-R203 | a transition or assignment | submitted with the case's ETag | 200 → view refreshed; 412 → "changed by someone else" and reload (SPEC-FE-01 R5) |
 | FE-R204 | agro.in | Queue → "Assigned to me" | own work list; same detail screen (J6) |
-| FE-R205 | tm.in | Overview | open cases by status and type, SLA at risk / breached, workload per assignee, unassigned; territory picker limited to the TM's territories (the overview's own scope); each status, type and SLA number links to the queue with the same filters. Workload shows **user ids** in Phase 1: the assignable-staff list needs one BU and the directory needs `user:read`; a staff-names lookup for `dashboard:read` is a follow-up in IAM |
+| FE-R205 | tm.in | Overview | open cases by status and type, SLA at risk / breached, workload per assignee, unassigned; territory picker limited to the TM's territories (the overview's own scope); each status, type and SLA number links to the queue with the same filters. ~~Workload shows **user ids** in Phase 1: the assignable-staff list needs one BU and the directory needs `user:read`; a staff-names lookup for `dashboard:read` is a follow-up in IAM~~ *Superseded by R209* |
 | FE-R206 | admin.in | Users & grants | search users (directory), open one: active grants; grant a role with scope (roles and territories from SPEC-IAM-04 reference endpoints) and an optional end date; revoke with a reason |
 | FE-R207 | retailer.in | Partner area | onboard a grower (assisted registration with the grower's phone, district and language, the shop as preferred retailer by default; then, with the grower present, the notices in the grower's language, the grower's optional choices, and the code sent to the grower's phone and read out to the retailer, PRD D3), my growers (`/growers?partner=mine`; pending ones offer "finish consent"), our cases (the queue, which the API already limits to cases raised by or shared with the org) |
 | FE-R208 | care.br | opens an Indian case URL | the not-found page (J8) |
+| FE-R209 | tm.in | Overview workload | assignees by **name** from `GET /api/iam/users/names?ids=` (SPEC-IAM-05, at most 100 ids); an id the lookup does not return (or a failed lookup) shows "User #id" |
 
 ## 2. Examples
 | Example | Rule | Persona / input | Expected |
@@ -39,12 +40,13 @@
 | FE-E207 | R207 | retailer.in onboards "Smoke Grower" with the code read out | grower ACTIVE in "my growers" |
 | FE-E208 | R208 | care.br | not-found page |
 | FE-E209 | D1 | grower.in1 signs in to the console | "for staff and partners" page |
+| FE-E210 | R209 | workload of 102 and 104; names returns 102 only · names fails | "Vikram Agro" and "User #104" · "User #102" and "User #104" |
 
 ## 3. Contracts used (through the gateway)
-IAM `/me`, `/users`, `/users/{id}`, `/grants`, reference roles, territories and assignable staff (SPEC-IAM-04); grower `/growers/search`, `/growers` (assisted, partner list), `/verifications`; case `/cases` (all filters), `/cases/overview`, `/cases/{id}`, `/transitions`, `/assignee`, `/comments`, `/activity`, `/attachments`.
+IAM `/me`, `/users`, `/users/{id}`, `/users/names`, `/grants`, reference roles, territories and assignable staff (SPEC-IAM-04); grower `/growers/search`, `/growers` (assisted, partner list), `/verifications`; case `/cases` (all filters), `/cases/overview`, `/cases/{id}`, `/transitions`, `/assignee`, `/comments`, `/activity`, `/attachments`.
 
 ## 6. Traceability
 | Rule / Example | Test |
 |---|---|
-| R200–R208 / E200–E209 | `apps/staff-console/src/features/*/__tests__` (Vitest + RTL + MSW + axe) |
+| R200–R209 / E200–E210 | `apps/staff-console/src/features/*/__tests__` (Vitest + RTL + MSW + axe) |
 | Journeys J5–J9 end to end | Playwright (M5) |

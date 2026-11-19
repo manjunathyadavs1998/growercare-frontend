@@ -16,8 +16,8 @@ export function Profile() {
   const [choice, setChoice] = useState<Language | null>(null);
   const language = choice ?? ((g?.preferredLanguage ?? 'en') as Language);
   const save = useMutation({
-    // grower-service documents this body as Jackson's JsonNode bean; it is SPEC-GRW-01's merge patch
-    mutationFn: () => grower.update(g?.growerId ?? '', { preferredLanguage: language } as unknown as grower.JsonNode,
+    // SPEC-FE-02 R111: SPEC-GRW-01's merge patch, typed by the contract
+    mutationFn: () => grower.update(g?.growerId ?? '', { preferredLanguage: language } satisfies grower.GrowerPatch,
       { headers: { 'If-Match': `"${g?.version ?? 0}"`, 'Content-Type': 'application/merge-patch+json' } }),
     onSuccess: () => {
       setUiLanguage(language);
