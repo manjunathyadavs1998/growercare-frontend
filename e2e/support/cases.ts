@@ -9,7 +9,7 @@ export async function growerRaisesCase(page: Page, title: string): Promise<strin
   await page.getByLabel('Short title').fill(title);
   await page.getByLabel('What happened?').fill('Which spray interval for grapes after rain? (Playwright)');
   await page.getByRole('button', { name: 'Send' }).click();
-  const status = page.getByRole('status');
+  const status = page.getByRole('status').filter({ hasText: 'raised' });
   await expect(status).toContainText(/Case \S+ raised/);
   return (await status.textContent())!.match(/Case (\S+) raised/)![1];
 }
@@ -19,7 +19,8 @@ export async function careOpensCase(page: Page, caseNo: string): Promise<void> {
   await signIn(page, STAFF_APP, USERS.careIn, '/growers');
   await page.getByLabel('Mobile number').fill(USERS.growerIn1.phone);
   await page.getByRole('button', { name: 'Find' }).click();
-  await expect(page.getByText(USERS.growerIn1.name)).toBeVisible();
+  // care agents see names masked (CARE_AGENT data scope MASKED): the grower is recognised by the phone
+  await expect(page.getByText(`…${USERS.growerIn1.phone.slice(-4)} · Active`)).toBeVisible();
   await expectAccessible(page, 'J5 grower lookup');
   await page.getByRole('link', { name: 'Cases of this grower' }).first().click();
   await page.getByRole('link', { name: caseNo }).click();

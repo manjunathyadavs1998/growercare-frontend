@@ -23,6 +23,7 @@ test('FE-E401 J1 a new grower signs up, consents and confirms the code', async (
   // FE-R101: the grower registration
   await expect(page.getByRole('heading', { name: 'Your details' })).toBeVisible();
   await expect(page.getByLabel('Mobile number')).toHaveValue(phone);
+  await page.getByLabel('Your name').fill(`Playwright Grower ${RUN}`);
   await page.getByLabel('District').selectOption({ label: 'Pune' });
   await page.getByLabel('Language for messages').selectOption('mr');
   await expectAccessible(page, 'J1 details');

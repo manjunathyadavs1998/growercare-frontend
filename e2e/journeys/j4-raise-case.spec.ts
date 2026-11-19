@@ -37,7 +37,9 @@ test('FE-E404 J4 grower.in1 raises a complaint about 9001 / AZX2604-117 with a p
   await page.getByRole('button', { name: 'Send' }).click();
 
   // listed, with the case number in the confirmation
-  await expect(page.getByRole('status')).toContainText(/Case \d{2}-\d{4}-\d{2}-\d{6}-\d raised/);
+  const raised = page.getByRole('status').filter({ hasText: 'raised' });
+  await expect(raised).toContainText(/Case \d{2}-\d{4}-\d{2}-\d{6}-\d raised/);
+  await expect(raised).not.toContainText('could not be uploaded');           // FE-R112: the photo reached the object store
   await expectAccessible(page, 'J4 my cases');
   await page.getByRole('link', { name: title }).click();
   await expect(page.getByRole('heading', { name: title })).toBeVisible();

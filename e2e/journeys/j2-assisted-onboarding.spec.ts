@@ -20,7 +20,8 @@ test('FE-E402 J2 retailer.in onboards a grower with the code from their phone', 
   await page.getByRole('button', { name: 'Register and continue' }).click();
 
   // the notices in the grower's language, then the code to the grower's phone
-  await expect(page.getByRole('heading', { name: `Consent for ${name}` })).toBeVisible();
+  // a retailer sees the grower's name masked (role data scope MASKED), e.g. "Consent for A******* G*****"
+  await expect(page.getByRole('heading', { name: /^Consent for / })).toBeVisible();
   await expectAccessible(page, 'J2 consent');
   await page.getByRole('button', { name: `Send the code to …${phone.slice(-4)}` }).click();
   const code = await otpFor(phone);
@@ -29,6 +30,6 @@ test('FE-E402 J2 retailer.in onboards a grower with the code from their phone', 
   await page.getByRole('button', { name: 'Confirm' }).click();
 
   // ACTIVE in "My growers"
-  await expect(page.getByRole('status')).toContainText(`${name} is now active.`);
-  await expect(page.getByText(name, { exact: true })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'is now active.' })).toBeVisible();
+  await expect(page.getByRole('listitem').filter({ hasText: `…${phone.slice(-4)} · Active` })).toBeVisible();
 });

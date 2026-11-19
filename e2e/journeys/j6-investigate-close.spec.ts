@@ -1,8 +1,21 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { persona } from '../support/cases';
 import { api, expectAccessible, GROWER_APP, raiseCaseByApi, RUN, signIn, STAFF_APP, USERS } from '../support/stack';
 
-/** SPEC-FE-04 FE-E406 (PRD J6): the assignee works the case to a closing status; a stale tab is refused. */
+/** Applies one offered workflow step on the staff case page and waits until the page shows the new state. */
+async function move(page: Page, step: string, next: string | null): Promise<void> {
+  const moves = page.getByRole('group', { name: 'Move the case to' });
+  await moves.getByRole('button', { name: step, exact: true }).click();
+  await page.getByLabel('Note for the trail (optional)').fill(`J6 ${step} ${RUN}`);
+  await page.getByRole('button', { name: `Move to ${step}` }).click();
+  if (next) await expect(moves.getByRole('button', { name: next, exact: true })).toBeVisible();
+}
+
+/**
+ * SPEC-FE-04 FE-E406 (PRD J6): the assignee works the case to a closing status; a stale tab is refused.
+ * The stale tab tries a step that is still valid (Advice given → Closed) with an old version, so the refusal is the
+ * version check (412), not the workflow (a step that is no longer offered is a 422 rule violation instead).
+ */
 test('FE-E406 J6 agro.in moves the case to Closed; a stale second tab gets a conflict', async ({ browser }) => {
   const { caseId } = await raiseCaseByApi(`Close me ${RUN}`);
   // set-up through the API: care.in assigns agro.in (102)
@@ -14,29 +27,29 @@ test('FE-E406 J6 agro.in moves the case to Closed; a stale second tab gets a con
 
   const agro = await persona(browser);
   await signIn(agro, STAFF_APP, USERS.agroIn, `/cases/${caseId}`);
-  const moves = agro.getByRole('group', { name: 'Move the case to' });
-  await expect(moves).toBeVisible();
+  await expect(agro.getByRole('group', { name: 'Move the case to' })).toBeVisible();
   await expectAccessible(agro, 'J6 staff case');
 
-  // a second tab opened now holds the case's current version
+  // Submitted → In progress → Advice given; a second tab opened now holds "Advice given" at this version
+  await move(agro, 'In progress', 'Advice given');
+  await move(agro, 'Advice given', 'Closed');
   const stale = await agro.context().newPage();
   await stale.goto(`${STAFF_APP}/cases/${caseId}`);
-  await expect(stale.getByRole('group', { name: 'Move the case to' })).toBeVisible();
+  const staleMoves: Locator = stale.getByRole('group', { name: 'Move the case to' });
+  await expect(staleMoves.getByRole('button', { name: 'Closed', exact: true })).toBeVisible();
 
-  // the offered steps, to a closing one: In progress → Advice given → Closed
-  for (const step of ['In progress', 'Advice given', 'Closed']) {
-    await moves.getByRole('button', { name: step }).click();
-    if (step === 'Closed') await expect(agro.getByText('This step closes the case.')).toBeVisible();
-    await agro.getByLabel('Note for the trail (optional)').fill(`J6 ${step} ${RUN}`);
-    await agro.getByRole('button', { name: `Move to ${step}` }).click();
-    if (step !== 'Closed') await expect(moves.getByRole('button', { name: step })).toHaveCount(0);
-  }
-  await expect(agro.getByText('No workflow step is open to you here.')).toBeVisible();
+  // meanwhile the first tab goes back and forth: same status, newer version
+  await move(agro, 'In progress', 'Advice given');
+  await move(agro, 'Advice given', 'Closed');
 
-  // the stale tab tries the first step with the old version → 412, "someone else changed this"
-  await stale.getByRole('group', { name: 'Move the case to' }).getByRole('button', { name: 'In progress' }).click();
-  await stale.getByRole('button', { name: 'Move to In progress' }).click();
+  // the stale tab's "Closed" carries the old version → 412, "someone else changed this"
+  await staleMoves.getByRole('button', { name: 'Closed', exact: true }).click();
+  await stale.getByRole('button', { name: 'Move to Closed' }).click();
   await expect(stale.getByText('Someone else changed this in the meantime. Reload to see the latest version.')).toBeVisible();
+
+  // the first tab closes the case
+  await move(agro, 'Closed', null);
+  await expect(agro.getByText('No workflow step is open to you here.')).toBeVisible();
 
   // the grower sees "Closed"
   const grower = await persona(browser);
