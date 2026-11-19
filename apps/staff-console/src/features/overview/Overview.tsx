@@ -34,6 +34,10 @@ export function Overview() {
   const scope = (territoryId ? whole.data?.data.scope : o?.scope)?.territoryIds ?? [];
   const queue = (filter: Record<string, string>) => `/?${new URLSearchParams({ ...filter, ...(territoryId ? { territoryId } : {}) })}`;
   const open = Object.values(o?.openByStatus ?? {}).reduce((a, b) => a + (b ?? 0), 0);
+  // R209: assignees by name (IAM, at most 100 ids per lookup); an id without a name stays "User #id"
+  const assignees = (o?.workload ?? []).map((w) => w.assigneeUserId).filter((x): x is string => !!x).slice(0, 100);
+  const staff = iam.useNames({ ids: assignees.join(',') }, { query: { enabled: assignees.length > 0, retry: false } });
+  const staffNames = new Map((staff.data?.data ?? []).map((s) => [s.userId, s.displayName]));
 
   return (
     <section>
@@ -89,7 +93,7 @@ export function Overview() {
               <ul className="mt-2 space-y-1 text-sm">
                 {(o.workload ?? []).map((w) => (
                   <li key={w.assigneeUserId} className="flex justify-between gap-2">
-                    <span><FormattedMessage id="overview.user" values={{ id: w.assigneeUserId }} /></span>
+                    <span>{(w.assigneeUserId && staffNames.get(w.assigneeUserId)) || <FormattedMessage id="overview.user" values={{ id: w.assigneeUserId }} />}</span>
                     <span className="tabular-nums">{w.open}</span>
                   </li>
                 ))}

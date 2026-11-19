@@ -60,9 +60,8 @@ function FarmForm({ initial, submitLabel, busy, onSubmit, onCancel }: {
 }
 
 const etag = (version: number | undefined) => `"${version ?? 0}"`;
-// grower-service's contract documents farm bodies as Jackson's JsonNode bean instead of their JSON shape (a contract bug to
-// fix there); the body below is SPEC-GRW-02 R200/R208's {name, areaHa, crops}.
-const toBody = (f: FarmInput) => ({ name: f.name.trim(), areaHa: Number(f.areaHa), crops: f.crops }) as unknown as grower.JsonNode;
+// SPEC-FE-02 R111: the contract's own body types (SPEC-GRW-02 R200/R208, documented by SPEC-GRW-07 D4)
+const toBody = (f: FarmInput): grower.FarmCreateRequest & grower.FarmPatch => ({ name: f.name.trim(), areaHa: Number(f.areaHa), crops: f.crops });
 
 /** SPEC-FE-02 R105 (PRD J3): the grower's farms: add, edit, archive. */
 export function Farms() {

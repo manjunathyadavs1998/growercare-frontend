@@ -198,29 +198,31 @@ function Files({ caseId, closed }: { caseId: string; closed: boolean }) {
 }
 
 /**
- * Share with the grower's own retailer (their preferred partner) or stop sharing. The case view does not carry its
- * shares, so the latest SHARED / UNSHARED entry of the trail tells the current state (a grower shares with one org).
+ * SPEC-FE-02 R110: share with the grower's own retailer (their preferred partner) or stop sharing. The case view lists
+ * the orgs it is shared with (SPEC-CASE-11); after a change the view and the trail are fetched again.
  */
 function Sharing({ caseId }: { caseId: string }) {
   const intl = useIntl();
   const queryClient = useQueryClient();
   const me = grower.useMe();
   const partner = me.data?.data.preferredPartnerOrgId;
-  const activity = cases.useActivity(caseId, { query: { refetchInterval: POLL } });
-  const last = [...(activity.data?.data ?? [])].reverse().find((a) => a.type === 'SHARED' || a.type === 'UNSHARED');
-  const shared = last?.type === 'SHARED';
+  const view = cases.useGet(caseId, { query: { refetchInterval: POLL, retry: false } });
+  const shared = partner !== undefined && (view.data?.data.sharedWithPartnerOrgIds ?? []).includes(partner);
   const toggle = useMutation({
     mutationFn: async (): Promise<void> => {
       if (shared) await cases.unshare(caseId, partner ?? '');
       else await cases.share(caseId, partner ?? '');
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: cases.getActivityQueryKey(caseId) }),
+    onSettled: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: cases.getGetQueryKey(caseId) }),
+      queryClient.invalidateQueries({ queryKey: cases.getActivityQueryKey(caseId) }),
+    ]),
   });
   if (!partner) return null;
   return (
     <Section title={intl.formatMessage({ id: 'detail.sharing' })}>
       <p className="text-sm"><FormattedMessage id={shared ? 'detail.shared' : 'detail.notShared'} /></p>
-      <Button variant="secondary" className="mt-2" disabled={toggle.isPending || activity.isPending} onClick={() => toggle.mutate()}>
+      <Button variant="secondary" className="mt-2" disabled={toggle.isPending || view.isPending} onClick={() => toggle.mutate()}>
         <FormattedMessage id={shared ? 'detail.unshare' : 'detail.share'} />
       </Button>
       {toggle.isError ? <div className="mt-2"><ErrorView error={toggle.error} /></div> : null}

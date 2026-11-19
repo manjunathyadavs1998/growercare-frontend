@@ -24,9 +24,11 @@
 | FE-R104 | grower `ACTIVE` | home | "My cases" (newest first, status chip, polling 30 s) and "Raise a case" |
 | FE-R105 | farms | add / edit / archive | `…/farms`: add (name, area in ha, 1–5 crops; Idempotency-Key), edit (merge patch with `If-Match`; 412 → reload), archive after an inline confirmation; an archived farm is no longer listed nor offered in the case form |
 | FE-R106 | raise a case | submit | type, farm (optional), product (search; else what it is about, D6) and batch (checked), title (≤ 200), description (≤ 4000), up to 5 photos or PDFs → `POST /api/cases/cases` with an Idempotency-Key (reused on retry), then per file: compress (D3), `POST …/attachments` with SHA-256, PUT to the presigned URL, `complete`. Back on My cases with "case … raised"; a failed upload never loses the case and is reported (the file can be added from the case, R107) |
-| FE-R107 | case detail | open | status, the public timeline (`/activity`, staff notes already hidden by the API), public comments oldest first (older pages on demand; a new comment shows at once and is rolled back if refused; polling 30 s), attachments (download the clean ones; add up to 5 while the case is open), share with my retailer (the preferred partner) / stop sharing. The case view carries no share state, so the latest SHARED / UNSHARED trail entry decides |
+| FE-R107 | case detail | open | status, the public timeline (`/activity`, staff notes already hidden by the API), public comments oldest first (older pages on demand; a new comment shows at once and is rolled back if refused; polling 30 s), attachments (download the clean ones; add up to 5 while the case is open), share with my retailer (the preferred partner) / stop sharing. ~~The case view carries no share state, so the latest SHARED / UNSHARED trail entry decides~~ *Superseded by R110* |
 | FE-R108 | another grower's case id | opened by URL | the not-found page (API 404) |
 | FE-R109 | profile | change language | `PATCH /api/grower/growers/{id}` (If-Match) and the UI language |
+| FE-R110 | case detail, a preferred retailer | open / share / stop sharing | the share state is the case view's `sharedWithPartnerOrgIds` (SPEC-CASE-11): shared when it holds the retailer; after a change the view is fetched again |
+| FE-R111 | farms and profile | save | request bodies are the contract's types (`FarmCreateRequest`, `FarmPatch`, `GrowerPatch`, SPEC-GRW-07 D4); no casts |
 
 ## 2. Examples (each becomes a component test; the journeys also a Playwright test in M5)
 | Example | Rule | Persona / input | Expected |
@@ -42,6 +44,8 @@
 | FE-E108 | R108 | grower.in2 opens grower.in1's case URL | not-found page |
 | FE-E109 | R109 | switch to हिंदी | saved (200, new ETag); UI in Hindi |
 | FE-E110 | budget | production build | initial JS ≤ 170 KB gzip; Lighthouse a11y ≥ 95 at 360 px |
+| FE-E111 | R110 | the view lists 501 (whatever the trail says) · lists nothing · share, then stop | "can see" · "cannot see" · PUT then DELETE `/shares/501`, the text follows the view |
+| FE-E112 | R111 | edit a farm; switch the language | the PATCH bodies are `{name, areaHa, crops}` and `{preferredLanguage}` (typecheck + component tests) |
 
 ## 3. Contracts used (through the gateway)
 IAM `/me`, `/self-registration`, reference territories and case types (SPEC-IAM-04); grower `/growers`, `/growers/me`, `/growers/{id}` (PATCH), `/consent-notices`, `/consents`, `/verifications`, `/farms`; catalog `/products`, `/products/{id}/batches/…`; case `/cases` (mine), `/cases/{id}`, `/activity`, `/comments`, `/attachments`, `/shares`.
@@ -49,6 +53,6 @@ IAM `/me`, `/self-registration`, reference territories and case types (SPEC-IAM-
 ## 6. Traceability
 | Rule / Example | Test |
 |---|---|
-| R100–R109 / E100–E109 | `apps/grower-web/src/features/*/__tests__` (Vitest + RTL + MSW + axe) |
+| R100–R111 / E100–E109, E111, E112 | `apps/grower-web/src/features/*/__tests__` (Vitest + RTL + MSW + axe) |
 | E110 | CI bundle budget + Lighthouse CI |
 | Journeys J1–J4 end to end | Playwright (M5) |

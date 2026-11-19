@@ -209,6 +209,12 @@
           "raisedViaPartnerOrgId": {
             "type": "string"
           },
+          "sharedWithPartnerOrgIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "slaDueAt": {
             "format": "date-time",
             "type": "string"

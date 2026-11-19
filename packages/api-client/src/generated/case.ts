@@ -103,6 +103,7 @@ export interface CaseView {
   raisedByUserId?: string;
   raisedChannel?: string;
   raisedViaPartnerOrgId?: string;
+  sharedWithPartnerOrgIds?: string[];
   slaDueAt?: string;
   slaState?: string;
   status?: string;

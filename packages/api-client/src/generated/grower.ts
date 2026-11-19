@@ -51,6 +51,45 @@ export interface ConsentPage {
   items?: ConsentView[];
 }
 
+export interface ContactView {
+  language?: string;
+  phone?: string;
+  status?: string;
+}
+
+/**
+ * A point; both coordinates or neither
+ */
+export interface Location {
+  /**
+     * @minimum -90
+     * @maximum 90
+     */
+  latitude?: number;
+  /**
+     * @minimum -180
+     * @maximum 180
+     */
+  longitude?: number;
+}
+
+export interface FarmCreateRequest {
+  /**
+     * hectares, > 0 with at most 2 decimals (R202)
+     * @minimum 0.01
+     * @maximum 100000
+     */
+  areaHa: number;
+  /**
+     * @minItems 1
+     * @maxItems 5
+     */
+  crops: string[];
+  location?: Location;
+  /** @maxLength 120 */
+  name: string;
+}
+
 export interface LocationView {
   latitude?: number;
   longitude?: number;
@@ -72,6 +111,26 @@ export interface FarmView {
 
 export interface FarmPage {
   items?: FarmView[];
+}
+
+/**
+ * JSON merge patch: absent = unchanged; location null clears it
+ */
+export interface FarmPatch {
+  /**
+     * hectares, > 0 with at most 2 decimals (R202)
+     * @minimum 0.01
+     * @maximum 100000
+     */
+  areaHa?: number;
+  /**
+     * @minItems 1
+     * @maxItems 5
+     */
+  crops?: string[];
+  location?: Location;
+  /** @maxLength 120 */
+  name?: string;
 }
 
 export interface GrowerView {
@@ -96,6 +155,20 @@ export interface GrowerPage {
   items?: GrowerView[];
 }
 
+/**
+ * JSON merge patch: absent = unchanged; preferredPartnerOrgId null clears it
+ */
+export interface GrowerPatch {
+  /** @maxLength 120 */
+  displayName?: string;
+  /** @maxLength 8 */
+  preferredLanguage?: string;
+  /** @pattern ^[1-9][0-9]{0,18}$ */
+  preferredPartnerOrgId?: string;
+  /** @pattern ^[1-9][0-9]{0,18}$ */
+  territoryId?: string;
+}
+
 export interface GrowerReplicaView {
   countryCode?: string;
   displayName?: string;
@@ -107,49 +180,6 @@ export interface GrowerReplicaView {
   territoryId?: string;
   userId?: string;
   version?: number;
-}
-
-export type JsonNodeNodeType = typeof JsonNodeNodeType[keyof typeof JsonNodeNodeType];
-
-
-export const JsonNodeNodeType = {
-  ARRAY: 'ARRAY',
-  BINARY: 'BINARY',
-  BOOLEAN: 'BOOLEAN',
-  MISSING: 'MISSING',
-  NULL: 'NULL',
-  NUMBER: 'NUMBER',
-  OBJECT: 'OBJECT',
-  POJO: 'POJO',
-  STRING: 'STRING',
-} as const;
-
-export interface JsonNode {
-  array?: boolean;
-  bigDecimal?: boolean;
-  bigInteger?: boolean;
-  binary?: boolean;
-  boolean?: boolean;
-  container?: boolean;
-  double?: boolean;
-  embeddedValue?: boolean;
-  empty?: boolean;
-  float?: boolean;
-  floatingPointNumber?: boolean;
-  int?: boolean;
-  integralNumber?: boolean;
-  long?: boolean;
-  missingNode?: boolean;
-  nodeType?: JsonNodeNodeType;
-  null?: boolean;
-  number?: boolean;
-  object?: boolean;
-  pojo?: boolean;
-  short?: boolean;
-  string?: boolean;
-  /** @deprecated */
-  textual?: boolean;
-  valueNode?: boolean;
 }
 
 export interface NoticeView {
@@ -897,14 +927,14 @@ export const getUpdateUrl = (growerId: string,) => {
 }
 
 export const update = async (growerId: string,
-    jsonNode?: JsonNode, options?: Parameters<typeof growerFetch>[1]): Promise<updateResponse> => {
+    growerPatch?: GrowerPatch, options?: Parameters<typeof growerFetch>[1]): Promise<updateResponse> => {
 
   return growerFetch<updateResponse>(getUpdateUrl(growerId),
   {
     ...options,
     method: 'PATCH',
-    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
-    body: JSON.stringify(jsonNode)
+    headers: getHeaders({ 'Content-Type': 'application/merge-patch+json' }, options?.headers),
+    body: JSON.stringify(growerPatch)
   }
 );}
 
@@ -942,9 +972,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateMutationResult = NonNullable<Awaited<ReturnType<typeof update>>>
-    export type UpdateMutationBody = JsonNode | undefined
+    export type UpdateMutationBody = GrowerPatch | undefined
     export type UpdateMutationError = unknown
-    export type UpdateMutationVariables = {growerId: string;data?: JsonNode}
+    export type UpdateMutationVariables = {growerId: string;data?: GrowerPatch}
 
     export const useUpdate = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof update>>, TError,UpdateMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
@@ -1288,14 +1318,14 @@ export const getCreateUrl = (growerId: string,) => {
 }
 
 export const create = async (growerId: string,
-    jsonNode: JsonNode, options?: Parameters<typeof growerFetch>[1]): Promise<createResponse> => {
+    farmCreateRequest: FarmCreateRequest, options?: Parameters<typeof growerFetch>[1]): Promise<createResponse> => {
 
   return growerFetch<createResponse>(getCreateUrl(growerId),
   {
     ...options,
     method: 'POST',
     headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
-    body: JSON.stringify(jsonNode)
+    body: JSON.stringify(farmCreateRequest)
   }
 );}
 
@@ -1333,9 +1363,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CreateMutationResult = NonNullable<Awaited<ReturnType<typeof create>>>
-    export type CreateMutationBody = JsonNode
+    export type CreateMutationBody = FarmCreateRequest
     export type CreateMutationError = unknown
-    export type CreateMutationVariables = {growerId: string;data: JsonNode}
+    export type CreateMutationVariables = {growerId: string;data: FarmCreateRequest}
 
     export const useCreate = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof create>>, TError,CreateMutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
@@ -1485,14 +1515,14 @@ export const getUpdate1Url = (growerId: string,
 
 export const update1 = async (growerId: string,
     farmId: string,
-    jsonNode?: JsonNode, options?: Parameters<typeof growerFetch>[1]): Promise<update1Response> => {
+    farmPatch?: FarmPatch, options?: Parameters<typeof growerFetch>[1]): Promise<update1Response> => {
 
   return growerFetch<update1Response>(getUpdate1Url(growerId,farmId),
   {
     ...options,
     method: 'PATCH',
-    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
-    body: JSON.stringify(jsonNode)
+    headers: getHeaders({ 'Content-Type': 'application/merge-patch+json' }, options?.headers),
+    body: JSON.stringify(farmPatch)
   }
 );}
 
@@ -1530,9 +1560,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type Update1MutationResult = NonNullable<Awaited<ReturnType<typeof update1>>>
-    export type Update1MutationBody = JsonNode | undefined
+    export type Update1MutationBody = FarmPatch | undefined
     export type Update1MutationError = unknown
-    export type Update1MutationVariables = {growerId: string;farmId: string;data?: JsonNode}
+    export type Update1MutationVariables = {growerId: string;farmId: string;data?: FarmPatch}
 
     export const useUpdate1 = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof update1>>, TError,Update1MutationVariables, TContext>, request?: SecondParameter<typeof growerFetch>}
