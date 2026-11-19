@@ -28,6 +28,7 @@
 | FE-R108 | another grower's case id | opened by URL | the not-found page (API 404) |
 | FE-R109 | profile | change language | `PATCH /api/grower/growers/{id}` (If-Match) and the UI language |
 | FE-R110 | case detail, a preferred retailer | open / share / stop sharing | the share state is the case view's `sharedWithPartnerOrgIds` (SPEC-CASE-11): shared when it holds the retailer; after a change the view is fetched again |
+| FE-R112 | a photo or PDF | uploaded to the presigned URL | each signed header is sent **once**: header names are case-insensitive, the presigned headers win and `Content-Type` is only added when they lack it (a duplicate becomes `image/jpeg, image/jpeg`, the signature no longer matches, and the object store answers 403; found by Playwright FE-E404) |
 | FE-R111 | farms and profile | save | request bodies are the contract's types (`FarmCreateRequest`, `FarmPatch`, `GrowerPatch`, SPEC-GRW-07 D4); no casts |
 
 ## 2. Examples (each becomes a component test; the journeys also a Playwright test in M5)
@@ -45,6 +46,7 @@
 | FE-E109 | R109 | switch to हिंदी | saved (200, new ETag); UI in Hindi |
 | FE-E110 | budget | production build | initial JS ≤ 170 KB gzip; Lighthouse a11y ≥ 95 at 360 px |
 | FE-E111 | R110 | the view lists 501 (whatever the trail says) · lists nothing · share, then stop | "can see" · "cannot see" · PUT then DELETE `/shares/501`, the text follows the view |
+| FE-E113 | R112 | presigned headers with `content-type` · `Content-Type` · none | one `Content-Type: image/jpeg` on the PUT in each case |
 | FE-E112 | R111 | edit a farm; switch the language | the PATCH bodies are `{name, areaHa, crops}` and `{preferredLanguage}` (typecheck + component tests) |
 
 ## 3. Contracts used (through the gateway)
@@ -53,6 +55,6 @@ IAM `/me`, `/self-registration`, reference territories and case types (SPEC-IAM-
 ## 6. Traceability
 | Rule / Example | Test |
 |---|---|
-| R100–R111 / E100–E109, E111, E112 | `apps/grower-web/src/features/*/__tests__` (Vitest + RTL + MSW + axe) |
+| R100–R112 / E100–E109, E111–E113 | `apps/grower-web/src/features/*/__tests__` (Vitest + RTL + MSW + axe) |
 | E110 | CI bundle budget + Lighthouse CI |
 | Journeys J1–J4 end to end | Playwright (M5) |
