@@ -33,10 +33,13 @@ export async function careWorksCase(page: Page, note: string, reply: string): Pr
   await page.getByLabel('Staff-only note (the grower does not see it)').fill(note);
   await page.getByRole('button', { name: 'Add note' }).click();
   await expect(page.getByText(note)).toBeVisible();
+  // the form clears once the post is saved: wait for that, or typing the reply races with the reset
+  await expect(page.getByLabel('Staff-only note (the grower does not see it)')).toHaveValue('');
   await page.getByLabel('Reply to the grower', { exact: true }).check();
   await page.getByLabel('Reply (the grower sees it)').fill(reply);
   await page.getByRole('button', { name: 'Send reply' }).click();
   await expect(page.getByText(reply)).toBeVisible();
+  await expect(page.getByLabel('Reply (the grower sees it)')).toHaveValue('');
   await selectOptionContaining(page, 'Assign to', USERS.agroIn.name);
   await page.getByRole('button', { name: 'Assign', exact: true }).click();
   await expect(page.getByText(`Assignee: ${USERS.agroIn.name}`)).toBeVisible();
