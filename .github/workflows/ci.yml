@@ -41,6 +41,9 @@ jobs:
       - name: Types
         run: pnpm typecheck
 
+      - name: Playwright journey types (SPEC-FE-04; the journeys run in growercare-local-platform's e2e job)
+        run: pnpm --filter e2e typecheck
+
       - name: Every message in every language (FE-01 D7)
         run: pnpm i18n:check
 
