@@ -1,7 +1,7 @@
 import { server } from '@gc/test-utils';
 import { http, HttpResponse } from 'msw';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { compressImage, kindOf, sha256Hex, targetSize, uploadAttachment } from '../upload';
+import { compressImage, kindOf, sha256Hex, signedHeaders, targetSize, uploadAttachment } from '../upload';
 
 const API = 'http://localhost/api';
 
@@ -37,6 +37,29 @@ describe('SPEC-FE-02 D3 photos are made smaller before upload', () => {
     expect(kindOf(new File([''], 'a.pdf', { type: 'application/pdf' }))).toBe('INVOICE');
     expect(kindOf(new File([''], 'a.jpg', { type: 'image/jpeg' }))).toBe('PHOTO');
     expect(await sha256Hex(new Blob(['abc']))).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+  });
+});
+
+describe('SPEC-FE-02 R112 every signed header is sent once', () => {
+  it.each([
+    ['lower-case content-type from the presigned URL', { 'content-type': 'image/jpeg', 'x-amz-checksum-sha256': 'abc' }],
+    ['Content-Type from the presigned URL', { 'Content-Type': 'image/jpeg' }],
+    ['no Content-Type in the presigned headers', {}],
+  ])('FE-E113 %s → one Content-Type', (_name, presigned) => {
+    const headers = signedHeaders(presigned as Record<string, string>, 'image/jpeg');
+    expect(headers.get('Content-Type')).toBe('image/jpeg');
+  });
+
+  it('FE-E113 the PUT itself carries one Content-Type', async () => {
+    let contentType: string | null = null;
+    server.use(
+      http.post(`${API}/cases/cases/:id/attachments`, () => HttpResponse.json({ attachmentId: '503',
+        upload: { method: 'PUT', url: 'http://storage.local/y', headers: { 'content-type': 'application/pdf' } } }, { status: 201 })),
+      http.put('http://storage.local/y', ({ request }) => { contentType = request.headers.get('content-type'); return new HttpResponse(null, { status: 200 }); }),
+      http.post(`${API}/cases/cases/:id/attachments/:att/complete`, () => HttpResponse.json({ attachmentId: '503', status: 'PENDING' })),
+    );
+    await uploadAttachment('1', new File(['%PDF-1.7'], 'a.pdf', { type: 'application/pdf' }));
+    expect(contentType).toBe('application/pdf');
   });
 });
 
