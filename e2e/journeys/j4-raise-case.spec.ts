@@ -48,10 +48,15 @@ test('FE-E404 J4 grower.in1 raises a complaint about 9001 / AZX2604-117 with a p
   const download = page.getByRole('button', { name: 'Download Photo' });
   await expect(download).toBeVisible({ timeout: 60_000 });
   await expectAccessible(page, 'J4 case detail');
-  const [opened] = await Promise.all([context.waitForEvent('page'), download.click()]);
-  await opened.waitForLoadState();
-  expect(opened.url()).toMatch(/^http:\/\/localhost:8333\//);
-  const fetched = await context.request.get(opened.url());
+  // the app asks case-service for a short-lived download URL and opens it (the object store serves it as an attachment)
+  const [answer] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes(`/attachments/`) && r.url().endsWith('/download')),
+    download.click(),
+  ]);
+  expect(answer.status()).toBe(200);
+  const { url } = (await answer.json()) as { url: string };
+  expect(url).toMatch(/^http:\/\/localhost:8333\/gc-media-clean\//);
+  const fetched = await context.request.get(url);
   expect(fetched.status()).toBe(200);
   expect(fetched.headers()['content-type']).toContain('image/jpeg');
 });
