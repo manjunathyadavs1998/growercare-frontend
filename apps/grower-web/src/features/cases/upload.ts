@@ -45,6 +45,16 @@ export function kindOf(file: File): 'PHOTO' | 'INVOICE' {
 }
 
 /**
+ * SPEC-FE-02 R112: the headers of the storage PUT. Header names are case-insensitive: the presigned ones win and
+ * Content-Type is only added when they lack it, so no header is sent twice (a doubled value breaks the signature).
+ */
+export function signedHeaders(presigned: Record<string, string> | undefined, contentType: string): Headers {
+  const headers = new Headers(presigned ?? {});
+  if (!headers.has('Content-Type')) headers.set('Content-Type', contentType);
+  return headers;
+}
+
+/**
  * SPEC-CASE-05 R96–R100 from the browser: ask case-service for a presigned upload, PUT the bytes straight to object
  * storage (they never pass the gateway, which caps bodies at 1 MB), then complete. The scan job publishes the file.
  */
@@ -56,7 +66,7 @@ export async function uploadAttachment(caseId: string, original: File): Promise<
   if (!attachmentId || !upload?.url) throw new ApiError({ status: 0, code: 'NETWORK', requestId: '' });
   const put = await fetch(upload.url, {
     method: upload.method ?? 'PUT',
-    headers: { 'Content-Type': file.type, ...(upload.headers ?? {}) } as Record<string, string>,
+    headers: signedHeaders(upload.headers, file.type),
     body: await readBytes(file),
   });
   if (!put.ok) throw new ApiError({ status: put.status === 0 ? 0 : 503, code: 'UPLOAD_FAILED', requestId: '' });
