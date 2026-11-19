@@ -1,6 +1,6 @@
 # SPEC-FE-04: End-to-end journeys (PRD M5)
 - **Requirements:** PRD Phase 1 §4 journeys **J1–J9**, §7 (testability: Playwright per persona against the local stack; WCAG 2.1 AA basics with axe; budgets), §10 M5 ("full local run green; exit criteria met"), D2 (OTPs read from the dev mailbox)
-- **Status:** Agreed
+- **Status:** Implemented
 - **Owner:** growercare-frontend (`e2e/`) with growercare-local-platform (stack, CI job)
 - **IDs:** rules FE-R400+, examples FE-E400+
 
