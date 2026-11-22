@@ -18,7 +18,7 @@
 | Rule | Given | When | Then |
 |---|---|---|---|
 | FE-R100 | new Keycloak user (phone username) without an IAM account | first sign-in | "Create your account": country (IN only listed in Phase 1) and name → `POST /api/iam/self-registration` → next step |
-| FE-R101 | account without a grower | next | registration form: territory (from the territories list), language, preferred retailer (optional) → `POST /api/grower/growers` |
+| FE-R101 | account without a grower | next | registration form: territory (from the territories list), language, preferred retailer (optional) → `POST /api/grower/growers`; the mobile number is the Keycloak username (`preferred_username`), shown read-only, **never** the `name` claim (Keycloak's sign-up form also takes an optional first and last name) |
 | FE-R102 | grower `PENDING_CONSENT` | next | the consent screen shows each **current notice's title and text** in the grower's language (`GET /api/grower/consent-notices`); SERVICE is required, the others optional |
 | FE-R103 | consent chosen | continue | `POST …/verifications` → the code screen; `…/confirm` with the code; wrong code shows attempts left; expired or too many attempts offers a new code (429 wait honoured) |
 | FE-R104 | grower `ACTIVE` | home | "My cases" (newest first, status chip, polling 30 s) and "Raise a case" |
@@ -48,6 +48,7 @@
 | FE-E111 | R110 | the view lists 501 (whatever the trail says) · lists nothing · share, then stop | "can see" · "cannot see" · PUT then DELETE `/shares/501`, the text follows the view |
 | FE-E113 | R112 | presigned headers with `content-type` · `Content-Type` · none | one `Content-Type: image/jpeg` on the PUT in each case |
 | FE-E112 | R111 | edit a farm; switch the language | the PATCH bodies are `{name, areaHa, crops}` and `{preferredLanguage}` (typecheck + component tests) |
+| FE-E114 | R101 | Keycloak user `+919972790609` who also gave first/last name "Manjunath Yadav" | "Mobile number" shows `+919972790609`; the registration body carries it; the header may show the name |
 
 ## 3. Contracts used (through the gateway)
 IAM `/me`, `/self-registration`, reference territories and case types (SPEC-IAM-04); grower `/growers`, `/growers/me`, `/growers/{id}` (PATCH), `/consent-notices`, `/consents`, `/verifications`, `/farms`; catalog `/products`, `/products/{id}/batches/…`; case `/cases` (mine), `/cases/{id}`, `/activity`, `/comments`, `/attachments`, `/shares`.
@@ -55,6 +56,6 @@ IAM `/me`, `/self-registration`, reference territories and case types (SPEC-IAM-
 ## 6. Traceability
 | Rule / Example | Test |
 |---|---|
-| R100–R112 / E100–E109, E111–E113 | `apps/grower-web/src/features/*/__tests__` (Vitest + RTL + MSW + axe) |
+| R100–R112 / E100–E109, E111–E114 | `apps/grower-web/src/features/*/__tests__` (Vitest + RTL + MSW + axe) |
 | E110 | CI bundle budget + Lighthouse CI |
 | Journeys J1–J4 end to end | Playwright (M5) |

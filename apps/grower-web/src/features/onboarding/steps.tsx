@@ -82,7 +82,7 @@ export function RegisterStep() {
     // the same key on every retry of this registration, a new one only after success (FE-01 R6)
     request: { headers: { 'Idempotency-Key': idempotency.key() } },
   });
-  const phone = auth.userName() ?? '';
+  const phone = auth.loginName() ?? '';
   const all = territories.data?.data ?? [];
   const districts = all.filter((t) => t.level !== 'STATE');
   const states = all.filter((t) => t.level === 'STATE');

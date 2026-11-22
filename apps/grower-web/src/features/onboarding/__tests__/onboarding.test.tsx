@@ -86,6 +86,18 @@ describe('SPEC-FE-02 onboarding (PRD J1, J2)', () => {
     expect(state.seen.register[0]?.key).toMatch(/^[0-9a-f-]{36}$/);
   });
 
+  it('FE-E114 the mobile number is the username the grower signed up with, not the name they gave Keycloak', async () => {
+    const state = onboardingServer({ account: true, grower: 'none' });
+    renderRoutes(routes, { catalogs: [messages], user: { userName: 'Manjunath Yadav', loginName: '+919972790609' } });
+    await screen.findByRole('heading', { name: 'Your details' });
+    expect(screen.getByLabelText('Mobile number')).toHaveValue('+919972790609');
+    await userEvent.type(screen.getByLabelText('Your name'), 'Manjunath Yadav');
+    await userEvent.selectOptions(await screen.findByLabelText('District'), 'Pune');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByRole('heading', { name: 'Before we start' })).toBeInTheDocument();
+    expect(state.seen.register[0]?.body).toMatchObject({ phone: '+919972790609', displayName: 'Manjunath Yadav' });
+  });
+
   it('FE-E102 the consent screen shows the notice texts in the UI language; SERVICE is required, the rest optional', async () => {
     const state = onboardingServer({ account: true, grower: 'pending' });
     const { container } = renderRoutes(routes, { catalogs: [messages], language: 'mr' });
