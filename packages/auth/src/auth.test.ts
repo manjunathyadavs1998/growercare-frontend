@@ -86,6 +86,17 @@ describe('SPEC-FE-01 sign-in', () => {
     expect(port.signinRedirect).toHaveBeenCalledWith({ state: { returnTo: '/cases?status=OPEN' } });
   });
 
+  it('FE-E114 the login name is the Keycloak username even when the user gave a first and last name', async () => {
+    const profile = { name: 'Manjunath Yadav', preferred_username: '+919972790609' };
+    const { port } = fakeOidc(async () => ({ access_token: 't', profile }));
+    const auth = createAuth(port, at(CALLBACK_PATH));
+    await auth.start();
+    expect(auth.loginName()).toBe('+919972790609');
+    expect(auth.userName()).toBe('Manjunath Yadav');
+    await auth.signOut();
+    expect(auth.loginName()).toBeNull();
+  });
+
   it('FE-E8 signing out forgets the token and ends the Keycloak session', async () => {
     const { port } = fakeOidc(async () => ({ access_token: 't', profile: { preferred_username: '+919876543210' } }));
     const auth = createAuth(port, at(CALLBACK_PATH));

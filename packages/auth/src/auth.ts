@@ -43,8 +43,10 @@ export interface AuthClient {
   /** 'signed-in' when the app may render; 'redirecting' when the browser is on its way to Keycloak. */
   start(): Promise<'signed-in' | 'redirecting'>;
   accessToken(): string | null;
-  /** Display name from the ID token (the phone number for growers). */
+  /** Display name from the ID token: the name the user gave, else the username. For display only. */
   userName(): string | null;
+  /** The Keycloak username (`preferred_username`): a grower's phone number (SPEC-FE-02 R101). Never the display name. */
+  loginName(): string | null;
   /**
    * True while the access token has more than 30 s left. Every 401 from the services carries the same code, so a 401
    * with a still-valid token means "no GrowerCare account yet" (SPEC-FE-02 R100), not "sign in again".
@@ -116,11 +118,13 @@ export function expiry(jwt: string): number | null {
 export function createAuth(oidc: OidcPort, nav: Navigator): AuthClient {
   let token: string | null = null;
   let name: string | null = null;
+  let login: string | null = null;
 
   const remember = (user: { access_token: string; profile?: Record<string, unknown> }) => {
     token = user.access_token;
     const profile = user.profile ?? {};
-    name = (profile.name as string | undefined) ?? (profile.preferred_username as string | undefined) ?? null;
+    login = (profile.preferred_username as string | undefined) ?? null;
+    name = (profile.name as string | undefined) ?? login;
   };
   oidc.onUserLoaded(remember);
 
@@ -157,10 +161,12 @@ export function createAuth(oidc: OidcPort, nav: Navigator): AuthClient {
       return exp !== null && exp * 1000 - now > 30_000;
     },
     userName: () => name,
+    loginName: () => login,
     signIn,
     async signOut() {
       token = null;
       name = null;
+      login = null;
       await oidc.removeUser();
       await oidc.signoutRedirect();
     },
