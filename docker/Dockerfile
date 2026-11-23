@@ -1,6 +1,6 @@
 # SPEC-FE-01 D10: one image per app (APP=grower-web | staff-console), built from apps/$APP/dist (pnpm build first).
 # Configuration only at runtime (environment variables → /config.json and the nginx site), never baked in.
-FROM nginx:1.30-alpine
+FROM nginx:1.31-alpine
 ARG APP
 COPY docker/site.conf.template /etc/nginx/gc/site.conf.template
 COPY docker/headers.conf.template /etc/nginx/gc/headers.conf.template
