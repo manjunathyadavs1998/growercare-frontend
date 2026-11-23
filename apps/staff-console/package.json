@@ -14,10 +14,10 @@
     "@gc/i18n": "workspace:*",
     "@gc/policy": "workspace:*",
     "@gc/ui-kit": "workspace:*",
-    "@tanstack/react-query": "^5.90.0",
+    "@tanstack/react-query": "^5.108.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-intl": "^7.1.14",
+    "react-intl": "^12.2.0",
     "react-router": "^7.18.0",
     "zustand": "^5.0.0",
     "oidc-client-ts": "^3.5.0"
